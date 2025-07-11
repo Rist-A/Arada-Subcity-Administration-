@@ -1,0 +1,30 @@
+
+main admin 
+  create subadmin
+  assign leader 
+  see all users
+  delete users 
+  edit users password
+  add request type 
+  edit request type 
+  see request 
+  edit request 
+  ? make analysis of the requests  
+
+
+
+class
+{
+subadmin
+   see request 
+  edit request 
+  ? make analysis of the requests  
+   
+}
+
+class
+{
+department leader 
+    make request 
+    see their request status 
+}
