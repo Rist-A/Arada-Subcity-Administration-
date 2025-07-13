@@ -4,7 +4,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import LoginPage from './components/LoginPage';
 import MainAdmin from './components/MainAdmin'
 import Users from './components/Users';
-import SubAdmin from './components/MainAdmin'
+import SubAdmin from './components/SubAdmin'
 
 // import other pages as needed (e.g., Dashboard, AdminPanel, etc.)
 

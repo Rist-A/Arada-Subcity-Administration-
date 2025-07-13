@@ -4,8 +4,8 @@ const adminController = require('../controllers/adminController');
 
 router.get('/', adminController.getAdmins);
 router.post('/', adminController.createAdmin);
-router.delete('/',adminController.deleteadmin);
-router.put('/',adminController.editAdmin);
+router.delete('/:id',adminController.deleteadmin);
+router.put('/:id',adminController.editAdmin);
 // You can add PUT, DELETE here
 
 module.exports = router;

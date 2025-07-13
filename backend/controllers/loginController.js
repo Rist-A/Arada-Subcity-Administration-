@@ -11,10 +11,13 @@ exports.loginUser = async (req, res) => {
     const admin = adminResult.rows[0];
 
     if (admin && await bcrypt.compare(password, admin.password_hash)) {
-      const token = jwt.sign({ email: admin.email, role: admin.status, userType: 'admin' }, process.env.JWT_SECRET, { expiresIn: '1d' });
+      const tokenPayload = { email: admin.email, role: admin.role, userType: admin.role };
+      const token = jwt.sign({ email: admin.email, role: admin.role, userType: admin.role }, process.env.JWT_SECRET, { expiresIn: '1d' });
+        const decoded = jwt.decode(token); // decode without verifying
       return res.status(200).json({
         message: 'Login successful',
-        token
+        token,
+         decodedToken: decoded
       });
     }
 
@@ -30,10 +33,13 @@ exports.loginUser = async (req, res) => {
     const leader = leaderResult.rows[0];
 
     if (leader && await bcrypt.compare(password, leader.password_hash)) {
+       const tokenPayload = { email: leader.department_email, role: 'department_leader', userType: 'leader' };
       const token = jwt.sign({ email: leader.department_email, role: 'department_leader', userType: 'leader' }, process.env.JWT_SECRET, { expiresIn: '1d' });
+        const decoded = jwt.decode(token);
       return res.status(200).json({
         message: 'Login successful',
-        token
+        token,
+          decodedToken: decoded
       });
     }
 
