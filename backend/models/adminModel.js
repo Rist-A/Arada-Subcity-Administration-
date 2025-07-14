@@ -28,24 +28,36 @@ exports.getAdminByUsername = async (username) => {
 };
 
 
-// Edit admin password
-exports.updateAdminPassword = async (username, newPasswordHash) => {
+exports.getAdminById = async (id) => {
   const result = await pool.query(
-    `UPDATE admin
-     SET password_hash = $2
-     WHERE username = $1
-     RETURNING *`,
-    [username, newPasswordHash]
+    'SELECT * FROM admin WHERE admin_id = $1',
+    [id]
   );
   return result.rows[0];
 };
 
 
-// Delete admin by username
-exports.deleteAdminByUsername = async (username) => {
+
+// Edit admin password
+exports.updateAdminPassword = async (adminId, newPasswordHash) => {
   const result = await pool.query(
-    'DELETE FROM admin WHERE username = $1 RETURNING *',
-    [username]
+    `UPDATE admin
+     SET password_hash = $1
+     WHERE admin_id = $2
+     RETURNING *`,
+    [newPasswordHash, adminId]
   );
-  return result.rows[0]; // null if not found
+  return result.rows[0];
 };
+
+
+
+// Delete admin by username
+exports.deleteAdminById = async (adminId) => {
+  const result = await pool.query(
+    'DELETE FROM admin WHERE admin_id = $1 RETURNING *',
+    [adminId]
+  );
+  return result.rows[0]; // Will be undefined if no match
+};
+

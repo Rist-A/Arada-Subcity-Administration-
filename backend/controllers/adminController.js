@@ -36,36 +36,39 @@ exports.createAdmin = async (req, res) => {
 // PUT edit admin password
 exports.editAdmin = async (req, res) => {
   try {
-    const { username, password, newpassword } = req.body;
+    const { password, newpassword } = req.body;
+    const { id } = req.params; // get admin ID from the route params
 
-    console.log("📥 Request body:", { username, password, newpassword });
+    if (!id || !password || !newpassword) {
+      return res.status(400).json({ message: 'Admin ID, current password, and new password are required.' });
+    }
 
-    const admin = await AdminModel.getAdminByUsername(username);
-    console.log("🧠 DB lookup result:", admin);
-
+    // 1. Find admin by ID
+    const admin = await AdminModel.getAdminById(id);
     if (!admin) {
-      console.log("❌ Admin not found");
-      return res.status(404).json({ message: 'Admin not found' });
+      return res.status(404).json({ message: 'Admin not found.' });
     }
 
-    console.log("🔐 Stored hash:", admin.password_hash);
-
+    // 2. Verify old password
     const isMatch = await bcrypt.compare(password, admin.password_hash);
-    console.log("🔍 bcrypt result:", isMatch);
-
     if (!isMatch) {
-      return res.status(401).json({ message: 'Invalid username or password' });
+      return res.status(401).json({ message: 'Incorrect current password.' });
     }
 
+    // 3. Hash new password
     const newHashedPassword = await bcrypt.hash(newpassword, 10);
-    const updated = await AdminModel.updateAdminPassword(username, newHashedPassword);
-    res.status(200).json({ message: 'Password updated successfully', admin: updated });
+
+    // 4. Update password
+    await AdminModel.updateAdminPassword(id, newHashedPassword);
+
+    res.status(200).json({ message: 'Password updated successfully.' });
 
   } catch (err) {
-    console.error("🔥 Error in editAdmin:", err);
-    res.status(500).json({ error: err.message });
+    console.error('🔥 Error in editAdmin:', err);
+    res.status(500).json({ message: 'Server error.', error: err.message });
   }
 };
+
 
 
 
@@ -73,13 +76,18 @@ exports.editAdmin = async (req, res) => {
 // DELETE admin
 exports.deleteadmin = async (req, res) => {
   try {
-    const { username } = req.body;
-    const deleted = await AdminModel.deleteAdminByUsername(username);
-    if (!deleted) {
-      return res.status(400).json({ message: 'User does not exist' });
+    const { id } = req.params; // Get ID from URL
+      const admin = await AdminModel.getAdminById(id);
+    if (!admin) {
+      return res.status(404).json({ message: 'Admin not found.' });
     }
-    res.status(200).json({ message: 'User deleted successfully', deletedUser: deleted });
+
+      await AdminModel.deleteAdminById(id);
+       res.status(200).json({ message: 'admin deleted successfully' });
+    
   } catch (err) {
+    console.error("🔥 Error in deleteadmin:", err);
     res.status(500).json({ error: err.message });
   }
 };
+
