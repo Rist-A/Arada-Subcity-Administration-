@@ -31,29 +31,13 @@ exports.create = async (data) => {
 
 exports.update = async (id, data) => {
   const {
-    leader_id,
-    department_id,
-    request_type_id,
-    title,
-    description,
-    created_at,
-    status,
-    scheduled_date,
-    completed_at,
+    status
   } = data;
   const result = await pool.query(
     `UPDATE request SET
-      leader_id = $1,
-      department_id = $2,
-      request_type_id = $3,
-      title = $4,
-      description = $5,
-      created_at = $6,
-      status = $7,
-      scheduled_date = $8,
-      completed_at = $9
-     WHERE request_id = $10 RETURNING *`,
-    [leader_id, department_id, request_type_id, title, description, created_at, status, scheduled_date, completed_at, id]
+      status = $1
+     WHERE request_id = $2 RETURNING *`,
+    [status ,id]
   );
   return result.rows[0];
 };

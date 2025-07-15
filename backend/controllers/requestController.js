@@ -21,7 +21,14 @@ exports.createRequest = async (req, res) => {
 exports.updateRequest = async (req, res) => {
   try {
     const { id } = req.params;
-    const updated = await RequestModel.update(id, req.body);
+    const { status } = req.body;
+
+    const allowedStatuses = ['Pending', 'Accepted', 'Rejected'];
+    if (!allowedStatuses.includes(status)) {
+      return res.status(400).json({ error: 'Invalid status value' });
+    }
+
+    const updated = await RequestModel.update(id, { status });
     if (!updated) return res.status(404).json({ message: 'Request not found' });
     res.json(updated);
   } catch (err) {

@@ -20,19 +20,50 @@ exports.create = async (data) => {
   return result.rows[0];
 };
 
-exports.update = async (id, data) => {
-  const { username, password_hash, full_name, department_id } = data;
+
+
+
+exports.getLeaderById = async (id) => {
   const result = await pool.query(
-    `UPDATE departmentleader SET
-      username = $1,
-      password_hash = $2,
-      full_name = $3,
-      department_id = $4
-     WHERE leader_id = $5 RETURNING *`,
-    [username, password_hash, full_name, department_id, id]
+    'SELECT * FROM departmentleader WHERE leader_id = $1',
+    [id]
   );
   return result.rows[0];
 };
+
+
+
+// Edit leader password
+exports.updateLeaderPassword = async (leaderId, newPasswordHash) => {
+  const result = await pool.query(
+    `UPDATE departmentleader
+     SET password_hash = $1
+     WHERE leader_id = $2
+     RETURNING *`,
+    [newPasswordHash, leaderId]
+  );
+  return result.rows[0];
+};
+
+
+
+
+
+
+
+// exports.update = async (id, data) => {
+//   const { username, password_hash, full_name, department_id } = data;
+//   const result = await pool.query(
+//     `UPDATE departmentleader SET
+//       username = $1,
+//       password_hash = $2,
+//       full_name = $3,
+//       department_id = $4
+//      WHERE leader_id = $5 RETURNING *`,
+//     [username, password_hash, full_name, department_id, id]
+//   );
+//   return result.rows[0];
+// };
 
 exports.remove = async (id) => {
   const result = await pool.query('DELETE FROM departmentleader WHERE leader_id = $1 RETURNING *', [id]);

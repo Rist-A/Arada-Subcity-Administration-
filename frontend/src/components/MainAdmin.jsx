@@ -1,1131 +1,43 @@
-
-// import React, { useState, useEffect } from 'react';
-// import { useNavigate } from 'react-router-dom';
-// import { motion, AnimatePresence } from 'framer-motion';
-// import axios from 'axios';
-// import {
-//   LineChart, Line, BarChart, Bar, PieChart, Pie, Cell,
-//   XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer
-// } from 'recharts';
-// import { FiUsers, FiSettings, FiFileText, FiPieChart, FiPlus, FiEdit2, FiTrash2, FiChevronDown, FiMenu, FiX } from 'react-icons/fi';
-
-// const MainAdmin = () => {
-//   const [activeTab, setActiveTab] = useState('dashboard');
-//   const [admins, setAdmins] = useState([]);
-//   const [departments, setDepartments] = useState([]);
-//   const [leaders, setLeaders] = useState([]);
-//   const [requestTypes, setRequestTypes] = useState([]);
-//   const [requests, setRequests] = useState([]);
-//   const [stats, setStats] = useState({
-//     totalRequests: 0,
-//     pendingRequests: 0,
-//     finishedRequests: 0
-//   });
-//   const [newAdmin, setNewAdmin] = useState({
-//     username: '',
-//     email: '',
-//     password_hash: '',
-//     role: 'subadmin'
-//   });
-//   const [newLeader, setNewLeader] = useState({
-//     username: '',
-//     fullname: '',
-//     email: '',
-//     password_hash: '',
-//     department_id: ''
-//   });
-//   const [newRequestType, setNewRequestType] = useState({
-//     name: ''
-//   });
-//   const [isLoading, setIsLoading] = useState(false);
-//   const [error, setError] = useState('');
-//   const [success, setSuccess] = useState('');
-//   const [expandedSections, setExpandedSections] = useState({
-//     admins: true,
-//     departments: true,
-//     requests: true
-//   });
-//   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-
-//   const navigate = useNavigate();
-
-//   // Animation variants
-//   const containerVariants = {
-//     hidden: { opacity: 0 },
-//     visible: {
-//       opacity: 1,
-//       transition: {
-//         staggerChildren: 0.1
-//       }
-//     }
-//   };
-
-//   const itemVariants = {
-//     hidden: { y: 20, opacity: 0 },
-//     visible: {
-//       y: 0,
-//       opacity: 1,
-//       transition: {
-//         duration: 0.5
-//       }
-//     }
-//   };
-
-//   // Fetch all data
-//   useEffect(() => {
-//     fetchAllData();
-//   }, []);
-
-//   const fetchAllData = async () => {
-//     setIsLoading(true);
-//     try {
-//       const [
-//         adminsRes, 
-//         departmentsRes, 
-//         leadersRes, 
-//         requestTypesRes, 
-//         requestsRes
-//       ] = await Promise.all([
-//         axios.get('/api/admins'),
-//         axios.get('/api/departments'),
-//         axios.get('/api/leaders'),
-//         axios.get('/api/request-types'),
-//         axios.get('/api/requests')
-//       ]);
-
-//       setAdmins(adminsRes.data);
-//       setDepartments(departmentsRes.data);
-//       setLeaders(leadersRes.data);
-//       setRequestTypes(requestTypesRes.data);
-//       setRequests(requestsRes.data);
-
-//       // Calculate stats
-//       const total = requestsRes.data.length;
-//       const pending = requestsRes.data.filter(r => r.status === 'Pending').length;
-//       const finished = requestsRes.data.filter(r => r.status === 'Finished').length;
-      
-//       setStats({
-//         totalRequests: total,
-//         pendingRequests: pending,
-//         finishedRequests: finished
-//       });
-//     } catch (err) {
-//       setError('Failed to fetch data. Please try again.');
-//       console.error('Fetch error:', err);
-//     } finally {
-//       setIsLoading(false);
-//     }
-//   };
-
-//   // Toggle section expansion
-//   const toggleSection = (section) => {
-//     setExpandedSections(prev => ({
-//       ...prev,
-//       [section]: !prev[section]
-//     }));
-//   };
-
-//   // Handle form changes
-//   const handleAdminChange = (e) => {
-//     setNewAdmin({
-//       ...newAdmin,
-//       [e.target.name]: e.target.value
-//     });
-//   };
-
-//   const handleLeaderChange = (e) => {
-//     setNewLeader({
-//       ...newLeader,
-//       [e.target.name]: e.target.value
-//     });
-//   };
-
-//   const handleRequestTypeChange = (e) => {
-//     setNewRequestType({
-//       ...newRequestType,
-//       [e.target.name]: e.target.value
-//     });
-//   };
-
-//   // Create new admin
-//   const createAdmin = async (e) => {
-//     e.preventDefault();
-//     try {
-//       const res = await axios.post('/api/admins', newAdmin);
-//       setAdmins([...admins, res.data]);
-//       setNewAdmin({ username: '', email: '', password_hash: '', role: 'subadmin' });
-//       setSuccess('Subadmin created successfully!');
-//       setTimeout(() => setSuccess(''), 3000);
-//     } catch (err) {
-//       setError(err.response?.data?.message || 'Failed to create subadmin.');
-//       setTimeout(() => setError(''), 3000);
-//     }
-//   };
-
-//   // Create new leader
-//   const createLeader = async (e) => {
-//     e.preventDefault();
-//     try {
-//       const res = await axios.post('/api/leaders', newLeader);
-//       setLeaders([...leaders, res.data]);
-//       setNewLeader({ username: '', fullname: '', email: '', password_hash: '', department_id: '' });
-//       setSuccess('Department leader created successfully!');
-//       setTimeout(() => setSuccess(''), 3000);
-//     } catch (err) {
-//       setError(err.response?.data?.message || 'Failed to create department leader.');
-//       setTimeout(() => setError(''), 3000);
-//     }
-//   };
-
-//   // Create new request type
-//   const createRequestType = async (e) => {
-//     e.preventDefault();
-//     try {
-//       const res = await axios.post('/api/request-types', newRequestType);
-//       setRequestTypes([...requestTypes, res.data]);
-//       setNewRequestType({ name: '' });
-//       setSuccess('Request type created successfully!');
-//       setTimeout(() => setSuccess(''), 3000);
-//     } catch (err) {
-//       setError(err.response?.data?.message || 'Failed to create request type.');
-//       setTimeout(() => setError(''), 3000);
-//     }
-//   };
-
-//   // Edit password for admin or leader
-//   const editPassword = async (type, id, newPassword) => {
-//     try {
-//       const endpoint = type === 'admin' ? '/api/admins' : '/api/leaders';
-//       await axios.put(`${endpoint}/${id}/password`, { password: newPassword });
-//       setSuccess('Password updated successfully!');
-//       setTimeout(() => setSuccess(''), 3000);
-//       fetchAllData(); // Refresh data
-//     } catch (err) {
-//       setError(err.response?.data?.message || 'Failed to update password.');
-//       setTimeout(() => setError(''), 3000);
-//     }
-//   };
-
-//   // Update request status
-//   const updateRequestStatus = async (requestId, newStatus) => {
-//     try {
-//       await axios.put(`/api/requests/${requestId}/status`, { status: newStatus });
-//       setRequests(requests.map(req => 
-//         req.id === requestId ? { ...req, status: newStatus } : req
-//       ));
-//       setSuccess('Request status updated!');
-//       setTimeout(() => setSuccess(''), 3000);
-//     } catch (err) {
-//       setError(err.response?.data?.message || 'Failed to update request status.');
-//       setTimeout(() => setError(''), 3000);
-//     }
-//   };
-
-//   // Delete item
-//   const deleteItem = async (type, id) => {
-//     if (!window.confirm('Are you sure you want to delete this item?')) return;
-    
-//     try {
-//       let endpoint = '';
-//       if (type === 'admin') endpoint = `/api/admins/${id}`;
-//       else if (type === 'leader') endpoint = `/api/leaders/${id}`;
-//       else if (type === 'requestType') endpoint = `/api/request-types/${id}`;
-      
-//       await axios.delete(endpoint);
-      
-//       // Update state
-//       if (type === 'admin') setAdmins(admins.filter(a => a.id !== id));
-//       else if (type === 'leader') setLeaders(leaders.filter(l => l.id !== id));
-//       else if (type === 'requestType') setRequestTypes(requestTypes.filter(rt => rt.id !== id));
-      
-//       setSuccess('Item deleted successfully!');
-//       setTimeout(() => setSuccess(''), 3000);
-//     } catch (err) {
-//       setError(err.response?.data?.message || 'Failed to delete item.');
-//       setTimeout(() => setError(''), 3000);
-//     }
-//   };
-
-//   // Data for charts
-//   const requestData = [
-//     { name: 'Total', value: stats.totalRequests },
-//     { name: 'Pending', value: stats.pendingRequests },
-//     { name: 'Finished', value: stats.finishedRequests }
-//   ];
-
-//   const departmentRequestData = departments.map(dept => {
-//     const deptRequests = requests.filter(req => req.department_id === dept.id);
-//     return {
-//       name: dept.name,
-//       requests: deptRequests.length
-//     };
-//   });
-
-//   const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
-
-//   return (
-//     <motion.div 
-//       className="flex flex-col md:flex-row h-screen bg-gray-100"
-//       initial="hidden"
-//       animate="visible"
-//       variants={containerVariants}
-//     >
-//       {/* Mobile Menu Button */}
-//       <button 
-//         className="md:hidden fixed top-4 right-4 z-50 p-2 bg-indigo-600 text-white rounded-md"
-//         onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-//       >
-//         {mobileMenuOpen ? <FiX size={24} /> : <FiMenu size={24} />}
-//       </button>
-
-//       {/* Sidebar */}
-//       <motion.div 
-//         className={`${mobileMenuOpen ? 'block' : 'hidden'} md:block w-full md:w-64 bg-indigo-800 text-white shadow-lg fixed md:relative z-40 h-full`}
-//         variants={itemVariants}
-//       >
-//         <div className="p-4 border-b border-indigo-700">
-//           <h1 className="text-2xl font-bold">Admin Portal</h1>
-//           <p className="text-indigo-300">Main Administrator</p>
-//         </div>
-//         <nav className="p-4">
-//           <ul className="space-y-2">
-//             <li>
-//               <button 
-//                 onClick={() => {
-//                   setActiveTab('dashboard');
-//                   setMobileMenuOpen(false);
-//                 }}
-//                 className={`flex items-center w-full p-3 rounded-lg transition ${activeTab === 'dashboard' ? 'bg-indigo-700' : 'hover:bg-indigo-700'}`}
-//               >
-//                 <FiPieChart className="mr-3" />
-//                 Dashboard
-//               </button>
-//             </li>
-//             <li>
-//               <button 
-//                 onClick={() => {
-//                   setActiveTab('admins');
-//                   setMobileMenuOpen(false);
-//                 }}
-//                 className={`flex items-center w-full p-3 rounded-lg transition ${activeTab === 'admins' ? 'bg-indigo-700' : 'hover:bg-indigo-700'}`}
-//               >
-//                 <FiUsers className="mr-3" />
-//                 Manage Admins
-//               </button>
-//             </li>
-//             <li>
-//               <button 
-//                 onClick={() => {
-//                   setActiveTab('departments');
-//                   setMobileMenuOpen(false);
-//                 }}
-//                 className={`flex items-center w-full p-3 rounded-lg transition ${activeTab === 'departments' ? 'bg-indigo-700' : 'hover:bg-indigo-700'}`}
-//               >
-//                 <FiSettings className="mr-3" />
-//                 Departments & Leaders
-//               </button>
-//             </li>
-//             <li>
-//               <button 
-//                 onClick={() => {
-//                   setActiveTab('requests');
-//                   setMobileMenuOpen(false);
-//                 }}
-//                 className={`flex items-center w-full p-3 rounded-lg transition ${activeTab === 'requests' ? 'bg-indigo-700' : 'hover:bg-indigo-700'}`}
-//               >
-//                 <FiFileText className="mr-3" />
-//                 Requests Management
-//               </button>
-//             </li>
-//           </ul>
-//         </nav>
-//       </motion.div>
-
-//       {/* Main Content */}
-//       <motion.div 
-//         className="flex-1 overflow-y-auto md:ml-64"
-//         variants={itemVariants}
-//       >
-//         <div className="p-4 md:p-8">
-//           {/* Loading Indicator */}
-//           {isLoading && (
-//             <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-//               <div className="bg-white p-6 rounded-lg shadow-lg">
-//                 <p className="text-lg font-semibold">Loading data...</p>
-//               </div>
-//             </div>
-//           )}
-
-//           {/* Notifications */}
-//           <AnimatePresence>
-//             {error && (
-//               <motion.div 
-//                 className="mb-4 p-4 bg-red-100 border-l-4 border-red-500 text-red-700"
-//                 initial={{ opacity: 0, x: 50 }}
-//                 animate={{ opacity: 1, x: 0 }}
-//                 exit={{ opacity: 0, x: 50 }}
-//               >
-//                 <p>{error}</p>
-//               </motion.div>
-//             )}
-//             {success && (
-//               <motion.div 
-//                 className="mb-4 p-4 bg-green-100 border-l-4 border-green-500 text-green-700"
-//                 initial={{ opacity: 0, x: 50 }}
-//                 animate={{ opacity: 1, x: 0 }}
-//                 exit={{ opacity: 0, x: 50 }}
-//               >
-//                 <p>{success}</p>
-//               </motion.div>
-//             )}
-//           </AnimatePresence>
-
-//           {/* Dashboard Tab */}
-//           {activeTab === 'dashboard' && (
-//             <motion.div
-//               initial={{ opacity: 0 }}
-//               animate={{ opacity: 1 }}
-//               transition={{ duration: 0.5 }}
-//             >
-//               <h2 className="text-2xl md:text-3xl font-bold mb-6 text-gray-800">Welcome, Main Administrator</h2>
-              
-//               {/* Stats Cards */}
-//               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 mb-8">
-//                 <motion.div 
-//                   className="bg-white p-4 md:p-6 rounded-xl shadow-md"
-//                   whileHover={{ y: -5 }}
-//                 >
-//                   <h3 className="text-gray-500 font-medium">Total Requests</h3>
-//                   <p className="text-2xl md:text-3xl font-bold text-indigo-600">{stats.totalRequests}</p>
-//                 </motion.div>
-//                 <motion.div 
-//                   className="bg-white p-4 md:p-6 rounded-xl shadow-md"
-//                   whileHover={{ y: -5 }}
-//                 >
-//                   <h3 className="text-gray-500 font-medium">Pending Requests</h3>
-//                   <p className="text-2xl md:text-3xl font-bold text-yellow-500">{stats.pendingRequests}</p>
-//                 </motion.div>
-//                 <motion.div 
-//                   className="bg-white p-4 md:p-6 rounded-xl shadow-md"
-//                   whileHover={{ y: -5 }}
-//                 >
-//                   <h3 className="text-gray-500 font-medium">Finished Requests</h3>
-//                   <p className="text-2xl md:text-3xl font-bold text-green-500">{stats.finishedRequests}</p>
-//                 </motion.div>
-//               </div>
-
-//               {/* Charts */}
-//               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8 mb-8">
-//                 <motion.div 
-//                   className="bg-white p-4 md:p-6 rounded-xl shadow-md"
-//                   initial={{ opacity: 0 }}
-//                   animate={{ opacity: 1 }}
-//                   transition={{ delay: 0.2 }}
-//                 >
-//                   <h3 className="text-lg font-semibold mb-4">Requests Overview</h3>
-//                   <div className="h-64">
-//                     <ResponsiveContainer width="100%" height="100%">
-//                       <PieChart>
-//                         <Pie
-//                           data={requestData}
-//                           cx="50%"
-//                           cy="50%"
-//                           labelLine={false}
-//                           outerRadius={80}
-//                           fill="#8884d8"
-//                           dataKey="value"
-//                           label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
-//                         >
-//                           {requestData.map((entry, index) => (
-//                             <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-//                           ))}
-//                         </Pie>
-//                         <Tooltip />
-//                       </PieChart>
-//                     </ResponsiveContainer>
-//                   </div>
-//                 </motion.div>
-//                 <motion.div 
-//                   className="bg-white p-4 md:p-6 rounded-xl shadow-md"
-//                   initial={{ opacity: 0 }}
-//                   animate={{ opacity: 1 }}
-//                   transition={{ delay: 0.4 }}
-//                 >
-//                   <h3 className="text-lg font-semibold mb-4">Requests by Department</h3>
-//                   <div className="h-64">
-//                     <ResponsiveContainer width="100%" height="100%">
-//                       <BarChart data={departmentRequestData}>
-//                         <CartesianGrid strokeDasharray="3 3" />
-//                         <XAxis dataKey="name" />
-//                         <YAxis />
-//                         <Tooltip />
-//                         <Legend />
-//                         <Bar dataKey="requests" fill="#8884d8" />
-//                       </BarChart>
-//                     </ResponsiveContainer>
-//                   </div>
-//                 </motion.div>
-//               </div>
-//             </motion.div>
-//           )}
-
-//           {/* Admins Tab */}
-//           {activeTab === 'admins' && (
-//             <motion.div
-//               initial={{ opacity: 0 }}
-//               animate={{ opacity: 1 }}
-//               transition={{ duration: 0.5 }}
-//             >
-//               <div className="flex justify-between items-center mb-6">
-//                 <h2 className="text-2xl md:text-3xl font-bold text-gray-800">Admin Management</h2>
-//               </div>
-
-//               {/* Create Subadmin */}
-//               <motion.div 
-//                 className="bg-white p-4 md:p-6 rounded-xl shadow-md mb-6 md:mb-8"
-//                 initial={{ y: 20, opacity: 0 }}
-//                 animate={{ y: 0, opacity: 1 }}
-//                 transition={{ delay: 0.2 }}
-//               >
-//                 <div 
-//                   className="flex justify-between items-center cursor-pointer"
-//                   onClick={() => toggleSection('createAdmin')}
-//                 >
-//                   <h3 className="text-lg md:text-xl font-semibold">Create New Subadmin</h3>
-//                   <FiChevronDown className={`transition-transform ${expandedSections.createAdmin ? 'rotate-180' : ''}`} />
-//                 </div>
-//                 <AnimatePresence>
-//                   {expandedSections.createAdmin && (
-//                     <motion.form 
-//                       onSubmit={createAdmin}
-//                       initial={{ height: 0, opacity: 0 }}
-//                       animate={{ height: 'auto', opacity: 1 }}
-//                       exit={{ height: 0, opacity: 0 }}
-//                       className="overflow-hidden"
-//                     >
-//                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-//                         <div>
-//                           <label className="block text-sm font-medium text-gray-700 mb-1">Username</label>
-//                           <input
-//                             type="text"
-//                             name="username"
-//                             value={newAdmin.username}
-//                             onChange={handleAdminChange}
-//                             className="w-full p-2 border border-gray-300 rounded-md"
-//                             required
-//                           />
-//                         </div>
-//                         <div>
-//                           <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
-//                           <input
-//                             type="email"
-//                             name="email"
-//                             value={newAdmin.email}
-//                             onChange={handleAdminChange}
-//                             className="w-full p-2 border border-gray-300 rounded-md"
-//                             required
-//                           />
-//                         </div>
-//                         <div>
-//                           <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
-//                           <input
-//                             type="password"
-//                             name="password_hash"
-//                             value={newAdmin.password_hash}
-//                             onChange={handleAdminChange}
-//                             className="w-full p-2 border border-gray-300 rounded-md"
-//                             required
-//                           />
-//                         </div>
-//                         <div>
-//                           <label className="block text-sm font-medium text-gray-700 mb-1">Role</label>
-//                           <select
-//                             name="role"
-//                             value={newAdmin.role}
-//                             onChange={handleAdminChange}
-//                             className="w-full p-2 border border-gray-300 rounded-md"
-//                             required
-//                           >
-//                             <option value="subadmin">Subadmin</option>
-//                           </select>
-//                         </div>
-//                       </div>
-//                       <button
-//                         type="submit"
-//                         className="mt-4 px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition"
-//                       >
-//                         Create Subadmin
-//                       </button>
-//                     </motion.form>
-//                   )}
-//                 </AnimatePresence>
-//               </motion.div>
-
-//               {/* Admins List */}
-//               <motion.div 
-//                 className="bg-white p-4 md:p-6 rounded-xl shadow-md"
-//                 initial={{ y: 20, opacity: 0 }}
-//                 animate={{ y: 0, opacity: 1 }}
-//                 transition={{ delay: 0.4 }}
-//               >
-//                 <div 
-//                   className="flex justify-between items-center cursor-pointer"
-//                   onClick={() => toggleSection('admins')}
-//                 >
-//                   <h3 className="text-lg md:text-xl font-semibold">All Admins ({admins.length})</h3>
-//                   <FiChevronDown className={`transition-transform ${expandedSections.admins ? 'rotate-180' : ''}`} />
-//                 </div>
-//                 <AnimatePresence>
-//                   {expandedSections.admins && (
-//                     <motion.div
-//                       initial={{ height: 0, opacity: 0 }}
-//                       animate={{ height: 'auto', opacity: 1 }}
-//                       exit={{ height: 0, opacity: 0 }}
-//                       className="overflow-hidden"
-//                     >
-//                       <div className="mt-4 overflow-x-auto">
-//                         <table className="min-w-full divide-y divide-gray-200">
-//                           <thead className="bg-gray-50">
-//                             <tr>
-//                               <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Username</th>
-//                               <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
-//                               <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Role</th>
-//                               <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-//                             </tr>
-//                           </thead>
-//                           <tbody className="bg-white divide-y divide-gray-200">
-//                             {admins.map((admin) => (
-//                               <motion.tr
-//                                 key={admin.id}
-//                                 initial={{ opacity: 0 }}
-//                                 animate={{ opacity: 1 }}
-//                                 transition={{ duration: 0.3 }}
-//                               >
-//                                 <td className="px-4 py-4 whitespace-nowrap">{admin.username}</td>
-//                                 <td className="px-4 py-4 whitespace-nowrap">{admin.email}</td>
-//                                 <td className="px-4 py-4 whitespace-nowrap">
-//                                   <span className={`px-2 py-1 text-xs rounded-full ${admin.role === 'mainadmin' ? 'bg-purple-100 text-purple-800' : 'bg-blue-100 text-blue-800'}`}>
-//                                     {admin.role}
-//                                   </span>
-//                                 </td>
-//                                 <td className="px-4 py-4 whitespace-nowrap space-x-2">
-//                                   <button
-//                                     onClick={() => {
-//                                       const newPassword = prompt('Enter new password:');
-//                                       if (newPassword) editPassword('admin', admin.id, newPassword);
-//                                     }}
-//                                     className="text-indigo-600 hover:text-indigo-900 text-sm md:text-base"
-//                                   >
-//                                     Change Password
-//                                   </button>
-//                                   {admin.role !== 'mainadmin' && (
-//                                     <button
-//                                       onClick={() => deleteItem('admin', admin.id)}
-//                                       className="text-red-600 hover:text-red-900 text-sm md:text-base"
-//                                     >
-//                                       Delete
-//                                     </button>
-//                                   )}
-//                                 </td>
-//                               </motion.tr>
-//                             ))}
-//                           </tbody>
-//                         </table>
-//                       </div>
-//                     </motion.div>
-//                   )}
-//                 </AnimatePresence>
-//               </motion.div>
-//             </motion.div>
-//           )}
-
-//           {/* Departments Tab */}
-//           {activeTab === 'departments' && (
-//             <motion.div
-//               initial={{ opacity: 0 }}
-//               animate={{ opacity: 1 }}
-//               transition={{ duration: 0.5 }}
-//             >
-//               <div className="flex justify-between items-center mb-6">
-//                 <h2 className="text-2xl md:text-3xl font-bold text-gray-800">Departments & Leaders</h2>
-//               </div>
-
-//               {/* Create Department Leader */}
-//               <motion.div 
-//                 className="bg-white p-4 md:p-6 rounded-xl shadow-md mb-6 md:mb-8"
-//                 initial={{ y: 20, opacity: 0 }}
-//                 animate={{ y: 0, opacity: 1 }}
-//                 transition={{ delay: 0.2 }}
-//               >
-//                 <div 
-//                   className="flex justify-between items-center cursor-pointer"
-//                   onClick={() => toggleSection('createLeader')}
-//                 >
-//                   <h3 className="text-lg md:text-xl font-semibold">Create New Department Leader</h3>
-//                   <FiChevronDown className={`transition-transform ${expandedSections.createLeader ? 'rotate-180' : ''}`} />
-//                 </div>
-//                 <AnimatePresence>
-//                   {expandedSections.createLeader && (
-//                     <motion.form 
-//                       onSubmit={createLeader}
-//                       initial={{ height: 0, opacity: 0 }}
-//                       animate={{ height: 'auto', opacity: 1 }}
-//                       exit={{ height: 0, opacity: 0 }}
-//                       className="overflow-hidden"
-//                     >
-//                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-//                         <div>
-//                           <label className="block text-sm font-medium text-gray-700 mb-1">Username</label>
-//                           <input
-//                             type="text"
-//                             name="username"
-//                             value={newLeader.username}
-//                             onChange={handleLeaderChange}
-//                             className="w-full p-2 border border-gray-300 rounded-md"
-//                             required
-//                           />
-//                         </div>
-//                         <div>
-//                           <label className="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
-//                           <input
-//                             type="text"
-//                             name="fullname"
-//                             value={newLeader.fullname}
-//                             onChange={handleLeaderChange}
-//                             className="w-full p-2 border border-gray-300 rounded-md"
-//                             required
-//                           />
-//                         </div>
-//                         <div>
-//                           <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
-//                           <input
-//                             type="email"
-//                             name="email"
-//                             value={newLeader.email}
-//                             onChange={handleLeaderChange}
-//                             className="w-full p-2 border border-gray-300 rounded-md"
-//                             required
-//                           />
-//                         </div>
-//                         <div>
-//                           <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
-//                           <input
-//                             type="password"
-//                             name="password_hash"
-//                             value={newLeader.password_hash}
-//                             onChange={handleLeaderChange}
-//                             className="w-full p-2 border border-gray-300 rounded-md"
-//                             required
-//                           />
-//                         </div>
-//                         <div className="md:col-span-2">
-//                           <label className="block text-sm font-medium text-gray-700 mb-1">Department</label>
-//                           <select
-//                             name="department_id"
-//                             value={newLeader.department_id}
-//                             onChange={handleLeaderChange}
-//                             className="w-full p-2 border border-gray-300 rounded-md"
-//                             required
-//                           >
-//                             <option value="">Select Department</option>
-//                             {departments.map(dept => (
-//                               <option key={dept.id} value={dept.id}>{dept.name}</option>
-//                             ))}
-//                           </select>
-//                         </div>
-//                       </div>
-//                       <button
-//                         type="submit"
-//                         className="mt-4 px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition"
-//                       >
-//                         Create Leader
-//                       </button>
-//                     </motion.form>
-//                   )}
-//                 </AnimatePresence>
-//               </motion.div>
-
-//               {/* Departments List */}
-//               <motion.div 
-//                 className="bg-white p-4 md:p-6 rounded-xl shadow-md mb-6 md:mb-8"
-//                 initial={{ y: 20, opacity: 0 }}
-//                 animate={{ y: 0, opacity: 1 }}
-//                 transition={{ delay: 0.4 }}
-//               >
-//                 <div 
-//                   className="flex justify-between items-center cursor-pointer"
-//                   onClick={() => toggleSection('departments')}
-//                 >
-//                   <h3 className="text-lg md:text-xl font-semibold">All Departments ({departments.length})</h3>
-//                   <FiChevronDown className={`transition-transform ${expandedSections.departments ? 'rotate-180' : ''}`} />
-//                 </div>
-//                 <AnimatePresence>
-//                   {expandedSections.departments && (
-//                     <motion.div
-//                       initial={{ height: 0, opacity: 0 }}
-//                       animate={{ height: 'auto', opacity: 1 }}
-//                       exit={{ height: 0, opacity: 0 }}
-//                       className="overflow-hidden"
-//                     >
-//                       <div className="mt-4 overflow-x-auto">
-//                         <table className="min-w-full divide-y divide-gray-200">
-//                           <thead className="bg-gray-50">
-//                             <tr>
-//                               <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-//                               <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Description</th>
-//                               <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Leader</th>
-//                             </tr>
-//                           </thead>
-//                           <tbody className="bg-white divide-y divide-gray-200">
-//                             {departments.map((dept) => {
-//                               const leader = leaders.find(l => l.department_id === dept.id);
-//                               return (
-//                                 <motion.tr
-//                                   key={dept.id}
-//                                   initial={{ opacity: 0 }}
-//                                   animate={{ opacity: 1 }}
-//                                   transition={{ duration: 0.3 }}
-//                                 >
-//                                   <td className="px-4 py-4 whitespace-nowrap">{dept.name}</td>
-//                                   <td className="px-4 py-4 whitespace-nowrap">{dept.description || 'N/A'}</td>
-//                                   <td className="px-4 py-4 whitespace-nowrap">
-//                                     {leader ? (
-//                                       <div>
-//                                         <p>{leader.fullname || leader.username}</p>
-//                                         <p className="text-sm text-gray-500">{leader.email}</p>
-//                                       </div>
-//                                     ) : 'No leader assigned'}
-//                                   </td>
-//                                 </motion.tr>
-//                               );
-//                             })}
-//                           </tbody>
-//                         </table>
-//                       </div>
-//                     </motion.div>
-//                   )}
-//                 </AnimatePresence>
-//               </motion.div>
-
-//               {/* Leaders List */}
-//               <motion.div 
-//                 className="bg-white p-4 md:p-6 rounded-xl shadow-md"
-//                 initial={{ y: 20, opacity: 0 }}
-//                 animate={{ y: 0, opacity: 1 }}
-//                 transition={{ delay: 0.6 }}
-//               >
-//                 <div 
-//                   className="flex justify-between items-center cursor-pointer"
-//                   onClick={() => toggleSection('leaders')}
-//                 >
-//                   <h3 className="text-lg md:text-xl font-semibold">All Department Leaders ({leaders.length})</h3>
-//                   <FiChevronDown className={`transition-transform ${expandedSections.leaders ? 'rotate-180' : ''}`} />
-//                 </div>
-//                 <AnimatePresence>
-//                   {expandedSections.leaders && (
-//                     <motion.div
-//                       initial={{ height: 0, opacity: 0 }}
-//                       animate={{ height: 'auto', opacity: 1 }}
-//                       exit={{ height: 0, opacity: 0 }}
-//                       className="overflow-hidden"
-//                     >
-//                       <div className="mt-4 overflow-x-auto">
-//                         <table className="min-w-full divide-y divide-gray-200">
-//                           <thead className="bg-gray-50">
-//                             <tr>
-//                               <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-//                               <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
-//                               <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Department</th>
-//                               <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-//                             </tr>
-//                           </thead>
-//                           <tbody className="bg-white divide-y divide-gray-200">
-//                             {leaders.map((leader) => {
-//                               const department = departments.find(d => d.id === leader.department_id);
-//                               return (
-//                                 <motion.tr
-//                                   key={leader.id}
-//                                   initial={{ opacity: 0 }}
-//                                   animate={{ opacity: 1 }}
-//                                   transition={{ duration: 0.3 }}
-//                                 >
-//                                   <td className="px-4 py-4 whitespace-nowrap">{leader.fullname || leader.username}</td>
-//                                   <td className="px-4 py-4 whitespace-nowrap">{leader.email}</td>
-//                                   <td className="px-4 py-4 whitespace-nowrap">
-//                                     {department ? department.name : 'Department not found'}
-//                                   </td>
-//                                   <td className="px-4 py-4 whitespace-nowrap space-x-2">
-//                                     <button
-//                                       onClick={() => {
-//                                         const newPassword = prompt('Enter new password:');
-//                                         if (newPassword) editPassword('leader', leader.id, newPassword);
-//                                       }}
-//                                       className="text-indigo-600 hover:text-indigo-900 text-sm md:text-base"
-//                                     >
-//                                       Change Password
-//                                     </button>
-//                                     <button
-//                                       onClick={() => deleteItem('leader', leader.id)}
-//                                       className="text-red-600 hover:text-red-900 text-sm md:text-base"
-//                                     >
-//                                       Delete
-//                                     </button>
-//                                   </td>
-//                                 </motion.tr>
-//                               );
-//                             })}
-//                           </tbody>
-//                         </table>
-//                       </div>
-//                     </motion.div>
-//                   )}
-//                 </AnimatePresence>
-//               </motion.div>
-//             </motion.div>
-//           )}
-
-//           {/* Requests Tab */}
-//           {activeTab === 'requests' && (
-//             <motion.div
-//               initial={{ opacity: 0 }}
-//               animate={{ opacity: 1 }}
-//               transition={{ duration: 0.5 }}
-//             >
-//               <div className="flex justify-between items-center mb-6">
-//                 <h2 className="text-2xl md:text-3xl font-bold text-gray-800">Requests Management</h2>
-//               </div>
-
-//               {/* Create Request Type */}
-//               <motion.div 
-//                 className="bg-white p-4 md:p-6 rounded-xl shadow-md mb-6 md:mb-8"
-//                 initial={{ y: 20, opacity: 0 }}
-//                 animate={{ y: 0, opacity: 1 }}
-//                 transition={{ delay: 0.2 }}
-//               >
-//                 <div 
-//                   className="flex justify-between items-center cursor-pointer"
-//                   onClick={() => toggleSection('createRequestType')}
-//                 >
-//                   <h3 className="text-lg md:text-xl font-semibold">Create New Request Type</h3>
-//                   <FiChevronDown className={`transition-transform ${expandedSections.createRequestType ? 'rotate-180' : ''}`} />
-//                 </div>
-//                 <AnimatePresence>
-//                   {expandedSections.createRequestType && (
-//                     <motion.form 
-//                       onSubmit={createRequestType}
-//                       initial={{ height: 0, opacity: 0 }}
-//                       animate={{ height: 'auto', opacity: 1 }}
-//                       exit={{ height: 0, opacity: 0 }}
-//                       className="overflow-hidden"
-//                     >
-//                       <div className="grid grid-cols-1 gap-4 mt-4">
-//                         <div>
-//                           <label className="block text-sm font-medium text-gray-700 mb-1">Name</label>
-//                           <input
-//                             type="text"
-//                             name="name"
-//                             value={newRequestType.name}
-//                             onChange={handleRequestTypeChange}
-//                             className="w-full p-2 border border-gray-300 rounded-md"
-//                             required
-//                           />
-//                         </div>
-//                       </div>
-//                       <button
-//                         type="submit"
-//                         className="mt-4 px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition"
-//                       >
-//                         Create Request Type
-//                       </button>
-//                     </motion.form>
-//                   )}
-//                 </AnimatePresence>
-//               </motion.div>
-
-//               {/* Request Types List */}
-//               <motion.div 
-//                 className="bg-white p-4 md:p-6 rounded-xl shadow-md mb-6 md:mb-8"
-//                 initial={{ y: 20, opacity: 0 }}
-//                 animate={{ y: 0, opacity: 1 }}
-//                 transition={{ delay: 0.4 }}
-//               >
-//                 <div 
-//                   className="flex justify-between items-center cursor-pointer"
-//                   onClick={() => toggleSection('requestTypes')}
-//                 >
-//                   <h3 className="text-lg md:text-xl font-semibold">Request Types ({requestTypes.length})</h3>
-//                   <FiChevronDown className={`transition-transform ${expandedSections.requestTypes ? 'rotate-180' : ''}`} />
-//                 </div>
-//                 <AnimatePresence>
-//                   {expandedSections.requestTypes && (
-//                     <motion.div
-//                       initial={{ height: 0, opacity: 0 }}
-//                       animate={{ height: 'auto', opacity: 1 }}
-//                       exit={{ height: 0, opacity: 0 }}
-//                       className="overflow-hidden"
-//                     >
-//                       <div className="mt-4 overflow-x-auto">
-//                         <table className="min-w-full divide-y divide-gray-200">
-//                           <thead className="bg-gray-50">
-//                             <tr>
-//                               <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-//                               <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-//                             </tr>
-//                           </thead>
-//                           <tbody className="bg-white divide-y divide-gray-200">
-//                             {requestTypes.map((type) => (
-//                               <motion.tr
-//                                 key={type.id}
-//                                 initial={{ opacity: 0 }}
-//                                 animate={{ opacity: 1 }}
-//                                 transition={{ duration: 0.3 }}
-//                               >
-//                                 <td className="px-4 py-4 whitespace-nowrap">{type.name}</td>
-//                                 <td className="px-4 py-4 whitespace-nowrap">
-//                                   <button
-//                                     onClick={() => deleteItem('requestType', type.id)}
-//                                     className="text-red-600 hover:text-red-900 text-sm md:text-base"
-//                                   >
-//                                     Delete
-//                                   </button>
-//                                 </td>
-//                               </motion.tr>
-//                             ))}
-//                           </tbody>
-//                         </table>
-//                       </div>
-//                     </motion.div>
-//                   )}
-//                 </AnimatePresence>
-//               </motion.div>
-
-//               {/* Requests List */}
-//               <motion.div 
-//                 className="bg-white p-4 md:p-6 rounded-xl shadow-md"
-//                 initial={{ y: 20, opacity: 0 }}
-//                 animate={{ y: 0, opacity: 1 }}
-//                 transition={{ delay: 0.6 }}
-//               >
-//                 <div 
-//                   className="flex justify-between items-center cursor-pointer"
-//                   onClick={() => toggleSection('requests')}
-//                 >
-//                   <h3 className="text-lg md:text-xl font-semibold">All Requests ({requests.length})</h3>
-//                   <FiChevronDown className={`transition-transform ${expandedSections.requests ? 'rotate-180' : ''}`} />
-//                 </div>
-//                 <AnimatePresence>
-//                   {expandedSections.requests && (
-//                     <motion.div
-//                       initial={{ height: 0, opacity: 0 }}
-//                       animate={{ height: 'auto', opacity: 1 }}
-//                       exit={{ height: 0, opacity: 0 }}
-//                       className="overflow-hidden"
-//                     >
-//                       <div className="mt-4 overflow-x-auto">
-//                         <table className="min-w-full divide-y divide-gray-200">
-//                           <thead className="bg-gray-50">
-//                             <tr>
-//                               <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">User</th>
-//                               <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Request Type</th>
-//                               <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Department</th>
-//                               <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Details</th>
-//                               <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-//                               <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-//                             </tr>
-//                           </thead>
-//                           <tbody className="bg-white divide-y divide-gray-200">
-//                             {requests.map((request) => {
-//                               const requestType = requestTypes.find(rt => rt.id === request.request_type_id);
-//                               const department = departments.find(d => d.id === request.department_id);
-//                               return (
-//                                 <motion.tr
-//                                   key={request.id}
-//                                   initial={{ opacity: 0 }}
-//                                   animate={{ opacity: 1 }}
-//                                   transition={{ duration: 0.3 }}
-//                                 >
-//                                   <td className="px-4 py-4 whitespace-nowrap">
-//                                     <p className="font-medium">{request.user_name}</p>
-//                                     <p className="text-sm text-gray-500">{request.user_email}</p>
-//                                   </td>
-//                                   <td className="px-4 py-4 whitespace-nowrap">
-//                                     {requestType ? requestType.name : 'Unknown'}
-//                                   </td>
-//                                   <td className="px-4 py-4 whitespace-nowrap">
-//                                     {department ? department.name : 'Unknown'}
-//                                   </td>
-//                                   <td className="px-4 py-4">
-//                                     <div className="max-w-xs truncate" title={request.details}>
-//                                       {request.details}
-//                                     </div>
-//                                   </td>
-//                                   <td className="px-4 py-4 whitespace-nowrap">
-//                                     <span className={`px-2 py-1 text-xs rounded-full ${
-//                                       request.status === 'Pending' ? 'bg-yellow-100 text-yellow-800' :
-//                                       request.status === 'Accepted' ? 'bg-blue-100 text-blue-800' :
-//                                       'bg-green-100 text-green-800'
-//                                     }`}>
-//                                       {request.status}
-//                                     </span>
-//                                   </td>
-//                                   <td className="px-4 py-4 whitespace-nowrap">
-//                                     <select
-//                                       value={request.status}
-//                                       onChange={(e) => updateRequestStatus(request.id, e.target.value)}
-//                                       className="p-1 border border-gray-300 rounded-md text-sm"
-//                                     >
-//                                       <option value="Pending">Pending</option>
-//                                       <option value="Accepted">Accepted</option>
-//                                       <option value="Finished">Finished</option>
-//                                     </select>
-//                                   </td>
-//                                 </motion.tr>
-//                               );
-//                             })}
-//                           </tbody>
-//                         </table>
-//                       </div>
-//                     </motion.div>
-//                   )}
-//                 </AnimatePresence>
-//               </motion.div>
-//             </motion.div>
-//           )}
-//         </div>
-//       </motion.div>
-//     </motion.div>
-//   );
-// };
-
-// export default MainAdmin;
-
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useSpring, animated } from 'react-spring';
 import axios from 'axios';
-import {
-  LineChart, Line, BarChart, Bar, PieChart, Pie, Cell,
-  XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer
-} from 'recharts';
-import { FiUsers, FiSettings, FiFileText, FiPieChart, FiPlus, FiEdit2, FiTrash2, FiChevronDown, FiMenu, FiX, FiCalendar } from 'react-icons/fi';
+import { 
+  FiMenu, FiX, FiChevronDown, FiChevronUp, FiRefreshCw, 
+  FiEdit, FiTrash2, FiCheck, FiClock, FiSlash, FiUser, 
+  FiUsers, FiSettings, FiFileText, FiPieChart, FiPlus, 
+  FiCalendar, FiHome, FiKey, FiPhone, FiShield
+} from 'react-icons/fi';
+import Chart from 'chart.js/auto';
+import { Dialog, Transition } from '@headlessui/react';
+import { Fragment } from 'react';
 
 const MainAdmin = () => {
-  const [activeTab, setActiveTab] = useState('dashboard');
+  // State for all data
   const [admins, setAdmins] = useState([]);
   const [departments, setDepartments] = useState([]);
   const [leaders, setLeaders] = useState([]);
   const [requestTypes, setRequestTypes] = useState([]);
   const [requests, setRequests] = useState([]);
-  const [reservations, setReservations] = useState([]);
-  const [stats, setStats] = useState({
-    totalRequests: 0,
-    pendingRequests: 0,
-    finishedRequests: 0
+  
+  // UI state
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [activeSection, setActiveSection] = useState('dashboard');
+  const [expandedSections, setExpandedSections] = useState({
+    admins: true,
+    departments: true,
+    leaders: true,
+    requests: true,
+    requestTypes: true
   });
+  const [isLoading, setIsLoading] = useState(true);
+  
+  // Form states
   const [newAdmin, setNewAdmin] = useState({
     username: '',
     email: '',
     password_hash: '',
+    phone_number: '',
     role: 'subadmin'
   });
   const [newLeader, setNewLeader] = useState({
@@ -1133,55 +45,53 @@ const MainAdmin = () => {
     full_name: '',
     email: '',
     password_hash: '',
+    phone_number: '',
     department_id: ''
   });
-  const [newDepartment, setNewDepartment] = useState({
-    name: '',
-    address: ''
-  });
-  const [newRequestType, setNewRequestType] = useState({
-    name: ''
-  });
+  const [newDepartment, setNewDepartment] = useState({ name: '', address: '' });
+  const [newRequestType, setNewRequestType] = useState({ name: '' });
   const [editingDepartment, setEditingDepartment] = useState(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
-  const [expandedSections, setExpandedSections] = useState({
-    admins: true,
-    departments: true,
-    requests: true,
-    reservations: true
+  
+  // Dialog states
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [deleteItemType, setDeleteItemType] = useState('');
+  const [deleteItemId, setDeleteItemId] = useState('');
+  const [isPasswordDialogOpen, setIsPasswordDialogOpen] = useState(false);
+  const [passwordForm, setPasswordForm] = useState({
+    id: '',
+    type: '',
+    currentPassword: '',
+    newPassword: '',
+    confirmPassword: ''
   });
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [passwordError, setPasswordError] = useState('');
+  
+  // Stats
+  const [stats, setStats] = useState({
+    pending: 0,
+    accepted: 0,
+    rejected: 0,
+    total: 0
+  });
 
-  const navigate = useNavigate();
-
-  // Animation variants
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.1
-      }
-    }
-  };
-
-  const itemVariants = {
-    hidden: { y: 20, opacity: 0 },
-    visible: {
-      y: 0,
-      opacity: 1,
-      transition: {
-        duration: 0.5
-      }
-    }
-  };
-
-  // Fetch all data
+  // Fetch all data on component mount
   useEffect(() => {
     fetchAllData();
   }, []);
+
+  // Load Calendly script when reservations section is active
+  useEffect(() => {
+    if (activeSection === 'reservations') {
+      const script = document.createElement('script');
+      script.src = 'https://assets.calendly.com/assets/external/widget.js';
+      script.async = true;
+      document.body.appendChild(script);
+
+      return () => {
+        document.body.removeChild(script);
+      };
+    }
+  }, [activeSection]);
 
   const fetchAllData = async () => {
     setIsLoading(true);
@@ -1205,23 +115,78 @@ const MainAdmin = () => {
       setLeaders(leadersRes.data);
       setRequestTypes(requestTypesRes.data);
       setRequests(requestsRes.data);
-      
-
-      // Calculate stats
-      const total = requestsRes.data.length;
-      const pending = requestsRes.data.filter(r => r.status === 'Pending').length;
-      const finished = requestsRes.data.filter(r => r.status === 'Finished').length;
-      
-      setStats({
-        totalRequests: total,
-        pendingRequests: pending,
-        finishedRequests: finished
-      });
+      calculateStats(requestsRes.data);
     } catch (err) {
-      setError('Failed to fetch data. Please try again.');
-      console.error('Fetch error:', err);
+      console.error('Error fetching data:', err);
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  // Calculate statistics
+  const calculateStats = (data) => {
+    const pending = data.filter(req => req.status === 'Pending').length;
+    const accepted = data.filter(req => req.status === 'Accepted').length;
+    const rejected = data.filter(req => req.status === 'Rejected').length;
+    
+    setStats({
+      pending,
+      accepted,
+      rejected,
+      total: data.length
+    });
+
+    // Update chart if it exists
+    if (window.requestChart) {
+      window.requestChart.data.datasets[0].data = [pending, accepted, rejected];
+      window.requestChart.update();
+    } else {
+      renderChart(pending, accepted, rejected);
+    }
+  };
+
+  // Render chart
+  const renderChart = (pending, accepted, rejected) => {
+    const ctx = document.getElementById('requestChart');
+    if (ctx) {
+      window.requestChart = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+          labels: ['Pending', 'Accepted', 'Rejected'],
+          datasets: [{
+            data: [pending, accepted, rejected],
+            backgroundColor: [
+              'rgba(255, 206, 86, 0.7)',
+              'rgba(75, 192, 192, 0.7)',
+              'rgba(255, 99, 132, 0.7)'
+            ],
+            borderColor: [
+              'rgba(255, 206, 86, 1)',
+              'rgba(75, 192, 192, 1)',
+              'rgba(255, 99, 132, 1)'
+            ],
+            borderWidth: 1
+          }]
+        },
+        options: {
+          cutout: '70%',
+          plugins: {
+            legend: {
+              position: 'bottom',
+              labels: {
+                font: {
+                  family: "'Poppins', sans-serif",
+                  size: 12
+                }
+              }
+            }
+          },
+          animation: {
+            animateScale: true,
+            animateRotate: true
+          }
+        }
+      });
     }
   };
 
@@ -1242,7 +207,6 @@ const MainAdmin = () => {
   };
 
   const handleLeaderChange = (e) => {
-    console.log('Changed:', e.target.name, e.target.value);
     setNewLeader({
       ...newLeader,
       [e.target.name]: e.target.value
@@ -1276,28 +240,38 @@ const MainAdmin = () => {
     try {
       const res = await axios.post('/api/admins', newAdmin);
       setAdmins([...admins, res.data]);
-      setNewAdmin({ username: '', email: '', password_hash: '', role: 'subadmin' });
-      setSuccess('Subadmin created successfully!');
-      setTimeout(() => setSuccess(''), 3000);
+      setNewAdmin({ 
+        username: '', 
+        email: '', 
+        password_hash: '', 
+        phone_number: '',
+        role: 'subadmin' 
+      });
+      // Show success message
     } catch (err) {
-      setError(err.response?.data?.message || 'Failed to create subadmin.');
-      setTimeout(() => setError(''), 3000);
+      console.error('Error creating admin:', err);
+      // Show error message
     }
   };
 
   // Create new leader
   const createLeader = async (e) => {
     e.preventDefault();
-     console.log('Submitting:', newLeader);
     try {
       const res = await axios.post('/api/leaders', newLeader);
       setLeaders([...leaders, res.data]);
-      setNewLeader({ username: '', full_name: '', email: '', password_hash: '', department_id: '' });
-      setSuccess('Department leader created successfully!');
-      setTimeout(() => setSuccess(''), 3000);
+      setNewLeader({ 
+        username: '', 
+        full_name: '', 
+        email: '', 
+        password_hash: '', 
+        phone_number: '',
+        department_id: '' 
+      });
+      // Show success message
     } catch (err) {
-      setError(err.response?.data?.message || 'Failed to create department leader.');
-      setTimeout(() => setError(''), 3000);
+      console.error('Error creating leader:', err);
+      // Show error message
     }
   };
 
@@ -1308,11 +282,10 @@ const MainAdmin = () => {
       const res = await axios.post('/api/departments', newDepartment);
       setDepartments([...departments, res.data]);
       setNewDepartment({ name: '', address: '' });
-      setSuccess('Department created successfully!');
-      setTimeout(() => setSuccess(''), 3000);
+      // Show success message
     } catch (err) {
-      setError(err.response?.data?.message || 'Failed to create department.');
-      setTimeout(() => setError(''), 3000);
+      console.error('Error creating department:', err);
+      // Show error message
     }
   };
 
@@ -1325,11 +298,10 @@ const MainAdmin = () => {
         dept.department_id === editingDepartment.department_id ? res.data : dept
       ));
       setEditingDepartment(null);
-      setSuccess('Department updated successfully!');
-      setTimeout(() => setSuccess(''), 3000);
+      // Show success message
     } catch (err) {
-      setError(err.response?.data?.message || 'Failed to update department.');
-      setTimeout(() => setError(''), 3000);
+      console.error('Error updating department:', err);
+      // Show error message
     }
   };
 
@@ -1340,1086 +312,1252 @@ const MainAdmin = () => {
       const res = await axios.post('/api/request-types', newRequestType);
       setRequestTypes([...requestTypes, res.data]);
       setNewRequestType({ name: '' });
-      setSuccess('Request type created successfully!');
-      setTimeout(() => setSuccess(''), 3000);
+      // Show success message
     } catch (err) {
-      setError(err.response?.data?.message || 'Failed to create request type.');
-      setTimeout(() => setError(''), 3000);
-    }
-  };
-
-  // Edit password for admin or leader
-  const editPassword = async (type, id, newPassword) => {
-    try {
-      const endpoint = type === 'admin' ? '/api/admins' : '/api/leaders';
-      await axios.put(`${endpoint}/${id}/password`, { password: newPassword });
-      setSuccess('Password updated successfully!');
-      setTimeout(() => setSuccess(''), 3000);
-      fetchAllData(); // Refresh data
-    } catch (err) {
-      setError(err.response?.data?.message || 'Failed to update password.');
-      setTimeout(() => setError(''), 3000);
+      console.error('Error creating request type:', err);
+      // Show error message
     }
   };
 
   // Update request status
   const updateRequestStatus = async (requestId, newStatus) => {
     try {
-      await axios.put(`/api/requests/${requestId}/status`, { status: newStatus });
+      await axios.put(`/api/requests/${requestId}`, { status: newStatus });
       setRequests(requests.map(req => 
         req.request_id === requestId ? { ...req, status: newStatus } : req
       ));
-      setSuccess('Request status updated!');
-      setTimeout(() => setSuccess(''), 3000);
+      calculateStats(requests.map(req => 
+        req.request_id === requestId ? { ...req, status: newStatus } : req
+      ));
+      // Show success message
     } catch (err) {
-      setError(err.response?.data?.message || 'Failed to update request status.');
-      setTimeout(() => setError(''), 3000);
+      console.error('Error updating request status:', err);
+      // Show error message
     }
   };
 
-  // Delete item
-  const deleteItem = async (type, id) => {
-    if (!window.confirm('Are you sure you want to delete this item?')) return;
-    
+  // Open delete confirmation dialog
+  const confirmDelete = (type, id) => {
+    setDeleteItemType(type);
+    setDeleteItemId(id);
+    setIsDeleteDialogOpen(true);
+  };
+
+  // Delete item after confirmation
+  const deleteItem = async () => {
     try {
       let endpoint = '';
-      if (type === 'admin') endpoint = `/api/admins/${id}`;
-      else if (type === 'leader') endpoint = `/api/leaders/${id}`;
-      else if (type === 'department') endpoint = `/api/departments/${id}`;
-      else if (type === 'requestType') endpoint = `/api/request-types/${id}`;
+      if (deleteItemType === 'admin') endpoint = `/api/admins/${deleteItemId}`;
+      else if (deleteItemType === 'leader') endpoint = `/api/leaders/${deleteItemId}`;
+      else if (deleteItemType === 'department') endpoint = `/api/departments/${deleteItemId}`;
+      else if (deleteItemType === 'requestType') endpoint = `/api/request-types/${deleteItemId}`;
       
       await axios.delete(endpoint);
       
       // Update state
-      if (type === 'admin') setAdmins(admins.filter(a => a.admin_id !== id));
-      else if (type === 'leader') setLeaders(leaders.filter(l => l.leader_id !== id));
-      else if (type === 'department') setDepartments(departments.filter(d => d.department_id !== id));
-      else if (type === 'requestType') setRequestTypes(requestTypes.filter(rt => rt.id !== id));
+      if (deleteItemType === 'admin') setAdmins(admins.filter(a => a.admin_id !== deleteItemId));
+      else if (deleteItemType === 'leader') setLeaders(leaders.filter(l => l.leader_id !== deleteItemId));
+      else if (deleteItemType === 'department') setDepartments(departments.filter(d => d.department_id !== deleteItemId));
+      else if (deleteItemType === 'requestType') setRequestTypes(requestTypes.filter(rt => rt.request_type_id !== deleteItemId));
       
-      setSuccess('Item deleted successfully!');
-      setTimeout(() => setSuccess(''), 3000);
+      // Show success message
     } catch (err) {
-      setError(err.response?.data?.message || 'Failed to delete item.');
-      setTimeout(() => setError(''), 3000);
+      console.error('Error deleting item:', err);
+      // Show error message
+    } finally {
+      setIsDeleteDialogOpen(false);
     }
   };
 
-  // Data for charts
-  const requestData = [
-    { name: 'Total', value: stats.totalRequests },
-    { name: 'Pending', value: stats.pendingRequests },
-    { name: 'Finished', value: stats.finishedRequests }
-  ];
+  // Open password change dialog
+  const openPasswordDialog = (type, id) => {
+    setPasswordForm({
+      id,
+      type,
+      currentPassword: '',
+      newPassword: '',
+      confirmPassword: ''
+    });
+    setPasswordError('');
+    setIsPasswordDialogOpen(true);
+  };
 
-  const departmentRequestData = departments.map(dept => {
-    const deptRequests = requests.filter(req => req.department_id === dept.department_id);
-    return {
-      name: dept.name,
-      requests: deptRequests.length
-    };
+  // Handle password change
+  const changePassword = async () => {
+    if (passwordForm.newPassword !== passwordForm.confirmPassword) {
+      setPasswordError('New passwords do not match');
+      return;
+    }
+
+    try {
+      const endpoint = passwordForm.type === 'admin' ? '/api/admins' : '/api/leaders';
+      await axios.put(`${endpoint}/${passwordForm.id}`, {
+        password: passwordForm.currentPassword,
+        newpassword: passwordForm.newPassword
+      });
+      
+      setIsPasswordDialogOpen(false);
+      // Show success message
+    } catch (err) {
+      setPasswordError(err.response?.data?.message || 'Failed to update password');
+    }
+  };
+
+  // Status badge component
+  const StatusBadge = ({ status }) => {
+    let bgColor, icon;
+    
+    switch(status) {
+      case 'Pending':
+        bgColor = 'bg-yellow-100 text-yellow-800';
+        icon = <FiClock className="mr-1" />;
+        break;
+      case 'Accepted':
+        bgColor = 'bg-green-100 text-green-800';
+        icon = <FiCheck className="mr-1" />;
+        break;
+      case 'Rejected':
+        bgColor = 'bg-red-100 text-red-800';
+        icon = <FiSlash className="mr-1" />;
+        break;
+      default:
+        bgColor = 'bg-gray-100 text-gray-800';
+    }
+
+    return (
+      <motion.span 
+        className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${bgColor}`}
+        whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.95 }}
+      >
+        {icon} {status}
+      </motion.span>
+    );
+  };
+
+  // Spring animations
+  const sidebarAnimation = useSpring({
+    width: isSidebarOpen ? 280 : 0,
+    opacity: isSidebarOpen ? 1 : 0
   });
 
-  const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
+  const cardAnimation = useSpring({
+    from: { opacity: 0, transform: 'translateY(20px)' },
+    to: { opacity: 1, transform: 'translateY(0)' }
+  });
+
+  // Function to open Calendly widget
+   const handleCalendlyClick = () => {
+    setActiveSection('reservations'); // Optional: update your section state
+    if (window.Calendly) {
+      window.Calendly.initPopupWidget({
+        url: 'https://calendly.com/ristwubrist/new-meeting',
+      });
+    } else {
+      alert("Calendly is not loaded. Please check your internet or script.");
+    }
+  };
 
   return (
-    <motion.div 
-      className="flex flex-col md:flex-row h-screen bg-gray-100"
-      initial="hidden"
-      animate="visible"
-      variants={containerVariants}
-    >
-      {/* Mobile Menu Button */}
-      <button 
-        className="md:hidden fixed top-4 right-4 z-50 p-2 bg-indigo-600 text-white rounded-md"
-        onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+    <div className="flex h-screen bg-gray-50 overflow-hidden">
+      {/* Animated Sidebar */}
+      <animated.div 
+        style={sidebarAnimation}
+        className="bg-gradient-to-b from-indigo-900 to-purple-800 shadow-xl relative"
       >
-        {mobileMenuOpen ? <FiX size={24} /> : <FiMenu size={24} />}
-      </button>
-
-      {/* Sidebar */}
-      <motion.div 
-        className={`${mobileMenuOpen ? 'block' : 'hidden'} md:block w-full md:w-64 bg-indigo-800 text-white shadow-lg fixed md:relative z-40 h-full`}
-        variants={itemVariants}
-      >
-        <div className="p-4 border-b border-indigo-700">
-          <h1 className="text-2xl font-bold">Admin Portal</h1>
-          <p className="text-indigo-300">Main Administrator</p>
-        </div>
-        <nav className="p-4">
-          <ul className="space-y-2">
-            <li>
-              <button 
-                onClick={() => {
-                  setActiveTab('dashboard');
-                  setMobileMenuOpen(false);
-                }}
-                className={`flex items-center w-full p-3 rounded-lg transition ${activeTab === 'dashboard' ? 'bg-indigo-700' : 'hover:bg-indigo-700'}`}
-              >
-                <FiPieChart className="mr-3" />
-                Dashboard
-              </button>
-            </li>
-            <li>
-              <button 
-                onClick={() => {
-                  setActiveTab('admins');
-                  setMobileMenuOpen(false);
-                }}
-                className={`flex items-center w-full p-3 rounded-lg transition ${activeTab === 'admins' ? 'bg-indigo-700' : 'hover:bg-indigo-700'}`}
-              >
-                <FiUsers className="mr-3" />
-                Manage Admins
-              </button>
-            </li>
-            <li>
-              <button 
-                onClick={() => {
-                  setActiveTab('departments');
-                  setMobileMenuOpen(false);
-                }}
-                className={`flex items-center w-full p-3 rounded-lg transition ${activeTab === 'departments' ? 'bg-indigo-700' : 'hover:bg-indigo-700'}`}
-              >
-                <FiSettings className="mr-3" />
-                Departments & Leaders
-              </button>
-            </li>
-            <li>
-              <button 
-                onClick={() => {
-                  setActiveTab('requests');
-                  setMobileMenuOpen(false);
-                }}
-                className={`flex items-center w-full p-3 rounded-lg transition ${activeTab === 'requests' ? 'bg-indigo-700' : 'hover:bg-indigo-700'}`}
-              >
-                <FiFileText className="mr-3" />
-                Requests Management
-              </button>
-            </li>
-            <li>
-              <button 
-                onClick={() => {
-                  setActiveTab('reservations');
-                  setMobileMenuOpen(false);
-                }}
-                className={`flex items-center w-full p-3 rounded-lg transition ${activeTab === 'reservations' ? 'bg-indigo-700' : 'hover:bg-indigo-700'}`}
-              >
-                <FiCalendar className="mr-3" />
-                Hall Reservations
-              </button>
-            </li>
-          </ul>
-        </nav>
-      </motion.div>
-
-      {/* Main Content */}
-      <motion.div 
-        className="flex-1 overflow-y-auto md:ml-64"
-        variants={itemVariants}
-      >
-        <div className="p-4 md:p-8">
-          {/* Loading Indicator */}
-          {isLoading && (
-            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-              <div className="bg-white p-6 rounded-lg shadow-lg">
-                <p className="text-lg font-semibold">Loading data...</p>
-              </div>
-            </div>
-          )}
-
-          {/* Notifications */}
-          <AnimatePresence>
-            {error && (
-              <motion.div 
-                className="mb-4 p-4 bg-red-100 border-l-4 border-red-500 text-red-700"
-                initial={{ opacity: 0, x: 50 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: 50 }}
-              >
-                <p>{error}</p>
-              </motion.div>
-            )}
-            {success && (
-              <motion.div 
-                className="mb-4 p-4 bg-green-100 border-l-4 border-green-500 text-green-700"
-                initial={{ opacity: 0, x: 50 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: 50 }}
-              >
-                <p>{success}</p>
-              </motion.div>
-            )}
-          </AnimatePresence>
-
-          {/* Dashboard Tab */}
-          {activeTab === 'dashboard' && (
-            <motion.div
+        <div className="p-6 h-full flex flex-col">
+          <div className="flex items-center justify-between mb-8">
+            <motion.h2 
+              className="text-white text-2xl font-bold"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ duration: 0.5 }}
+              transition={{ delay: 0.2 }}
             >
-              <h2 className="text-2xl md:text-3xl font-bold mb-6 text-gray-800">Welcome, Main Administrator</h2>
+              Admin Portal
+            </motion.h2>
+            <motion.button
+              onClick={() => setIsSidebarOpen(false)}
+              whileHover={{ rotate: 90 }}
+              className="text-white"
+            >
+              <FiX size={24} />
+            </motion.button>
+          </div>
+
+          <nav className="flex-1">
+            <motion.ul 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.4 }}
+              className="space-y-2"
+            >
+              <li>
+                <button 
+                  onClick={() => setActiveSection('dashboard')}
+                  className={`flex items-center w-full p-3 rounded-lg transition ${activeSection === 'dashboard' ? 'bg-indigo-700' : 'hover:bg-indigo-700'}`}
+                >
+                  <FiHome className="mr-3" />
+                  Dashboard
+                </button>
+              </li>
               
-              {/* Stats Cards */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 mb-8">
-                <motion.div 
-                  className="bg-white p-4 md:p-6 rounded-xl shadow-md"
-                  whileHover={{ y: -5 }}
-                >
-                  <h3 className="text-gray-500 font-medium">Total Requests</h3>
-                  <p className="text-2xl md:text-3xl font-bold text-indigo-600">{stats.totalRequests}</p>
-                </motion.div>
-                <motion.div 
-                  className="bg-white p-4 md:p-6 rounded-xl shadow-md"
-                  whileHover={{ y: -5 }}
-                >
-                  <h3 className="text-gray-500 font-medium">Pending Requests</h3>
-                  <p className="text-2xl md:text-3xl font-bold text-yellow-500">{stats.pendingRequests}</p>
-                </motion.div>
-                <motion.div 
-                  className="bg-white p-4 md:p-6 rounded-xl shadow-md"
-                  whileHover={{ y: -5 }}
-                >
-                  <h3 className="text-gray-500 font-medium">Finished Requests</h3>
-                  <p className="text-2xl md:text-3xl font-bold text-green-500">{stats.finishedRequests}</p>
-                </motion.div>
-              </div>
-
-              {/* Charts */}
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8 mb-8">
-                <motion.div 
-                  className="bg-white p-4 md:p-6 rounded-xl shadow-md"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: 0.2 }}
-                >
-                  <h3 className="text-lg font-semibold mb-4">Requests Overview</h3>
-                  <div className="h-64">
-                    <ResponsiveContainer width="100%" height="100%">
-                      <PieChart>
-                        <Pie
-                          data={requestData}
-                          cx="50%"
-                          cy="50%"
-                          labelLine={false}
-                          outerRadius={80}
-                          fill="#8884d8"
-                          dataKey="value"
-                          label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
-                        >
-                          {requestData.map((entry, index) => (
-                            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                          ))}
-                        </Pie>
-                        <Tooltip />
-                      </PieChart>
-                    </ResponsiveContainer>
-                  </div>
-                </motion.div>
-                <motion.div 
-                  className="bg-white p-4 md:p-6 rounded-xl shadow-md"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: 0.4 }}
-                >
-                  <h3 className="text-lg font-semibold mb-4">Requests by Department</h3>
-                  <div className="h-64">
-                    <ResponsiveContainer width="100%" height="100%">
-                      <BarChart data={departmentRequestData}>
-                        <CartesianGrid strokeDasharray="3 3" />
-                        <XAxis dataKey="name" />
-                        <YAxis />
-                        <Tooltip />
-                        <Legend />
-                        <Bar dataKey="requests" fill="#8884d8" />
-                      </BarChart>
-                    </ResponsiveContainer>
-                  </div>
-                </motion.div>
-              </div>
-            </motion.div>
-          )}
-
-          {/* Admins Tab */}
-          {activeTab === 'admins' && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.5 }}
-            >
-              <div className="flex justify-between items-center mb-6">
-                <h2 className="text-2xl md:text-3xl font-bold text-gray-800">Admin Management</h2>
-              </div>
-
-              {/* Create Subadmin */}
-              <motion.div 
-                className="bg-white p-4 md:p-6 rounded-xl shadow-md mb-6 md:mb-8"
-                initial={{ y: 20, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                transition={{ delay: 0.2 }}
-              >
+              {/* Admin Management Section */}
+              <li>
                 <div 
-                  className="flex justify-between items-center cursor-pointer"
-                  onClick={() => toggleSection('createAdmin')}
-                >
-                  <h3 className="text-lg md:text-xl font-semibold">Create New Subadmin</h3>
-                  <FiChevronDown className={`transition-transform ${expandedSections.createAdmin ? 'rotate-180' : ''}`} />
-                </div>
-                <AnimatePresence>
-                  {expandedSections.createAdmin && (
-                    <motion.form 
-                      onSubmit={createAdmin}
-                      initial={{ height: 0, opacity: 0 }}
-                      animate={{ height: 'auto', opacity: 1 }}
-                      exit={{ height: 0, opacity: 0 }}
-                      className="overflow-hidden"
-                    >
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-1">Username</label>
-                          <input
-                            type="text"
-                            name="username"
-                            value={newAdmin.username}
-                            onChange={handleAdminChange}
-                            className="w-full p-2 border border-gray-300 rounded-md"
-                            required
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
-                          <input
-                            type="email"
-                            name="email"
-                            value={newAdmin.email}
-                            onChange={handleAdminChange}
-                            className="w-full p-2 border border-gray-300 rounded-md"
-                            required
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
-                          <input
-                            type="password"
-                            name="password_hash"
-                            value={newAdmin.password_hash}
-                            onChange={handleAdminChange}
-                            className="w-full p-2 border border-gray-300 rounded-md"
-                            required
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-1">Role</label>
-                          <select
-                            name="role"
-                            value={newAdmin.role}
-                            onChange={handleAdminChange}
-                            className="w-full p-2 border border-gray-300 rounded-md"
-                            required
-                          >
-                            <option value="subadmin">Subadmin</option>
-                          </select>
-                        </div>
-                      </div>
-                      <button
-                        type="submit"
-                        className="mt-4 px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition"
-                      >
-                        Create Subadmin
-                      </button>
-                    </motion.form>
-                  )}
-                </AnimatePresence>
-              </motion.div>
-
-              {/* Admins List */}
-              <motion.div 
-                className="bg-white p-4 md:p-6 rounded-xl shadow-md"
-                initial={{ y: 20, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                transition={{ delay: 0.4 }}
-              >
-                <div 
-                  className="flex justify-between items-center cursor-pointer"
+                  className="flex items-center justify-between p-3 rounded-lg cursor-pointer hover:bg-indigo-700"
                   onClick={() => toggleSection('admins')}
                 >
-                  <h3 className="text-lg md:text-xl font-semibold">All Admins ({admins.length})</h3>
-                  <FiChevronDown className={`transition-transform ${expandedSections.admins ? 'rotate-180' : ''}`} />
+                  <div className="flex items-center">
+                    <FiUser className="mr-3" />
+                    <span>Admin Management</span>
+                  </div>
+                  {expandedSections.admins ? <FiChevronUp /> : <FiChevronDown />}
                 </div>
                 <AnimatePresence>
                   {expandedSections.admins && (
-                    <motion.div
+                    <motion.ul
                       initial={{ height: 0, opacity: 0 }}
                       animate={{ height: 'auto', opacity: 1 }}
                       exit={{ height: 0, opacity: 0 }}
-                      className="overflow-hidden"
+                      className="ml-8 mt-1 space-y-1 overflow-hidden"
                     >
-                      <div className="mt-4 overflow-x-auto">
-                        <table className="min-w-full divide-y divide-gray-200">
-                          <thead className="bg-gray-50">
-                            <tr>
-                              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Username</th>
-                              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
-                              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Role</th>
-                              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-                            </tr>
-                          </thead>
-                          <tbody className="bg-white divide-y divide-gray-200">
-                            {admins.map((admin) => (
-                              <motion.tr
-                                key={admin.id}
-                                initial={{ opacity: 0 }}
-                                animate={{ opacity: 1 }}
-                                transition={{ duration: 0.3 }}
-                              >
-                                <td className="px-4 py-4 whitespace-nowrap">{admin.username}</td>
-                                <td className="px-4 py-4 whitespace-nowrap">{admin.email}</td>
-                                <td className="px-4 py-4 whitespace-nowrap">
-                                  <span className={`px-2 py-1 text-xs rounded-full ${admin.role === 'mainadmin' ? 'bg-purple-100 text-purple-800' : 'bg-blue-100 text-blue-800'}`}>
-                                    {admin.role}
-                                  </span>
-                                </td>
-                                <td className="px-4 py-4 whitespace-nowrap space-x-2">
-                                  <button
-                                    onClick={() => {
-                                      const newPassword = prompt('Enter new password:');
-                                      if (newPassword) editPassword('admin', admin.admin_id, newPassword);
-                                    }}
-                                    className="text-indigo-600 hover:text-indigo-900 text-sm md:text-base"
-                                  >
-                                    Change Password
-                                  </button>
-                                  {admin.role !== 'mainadmin' && (
-                                    <button
-                                      onClick={() => deleteItem('admin', admin.admin_id)}
-                                      className="text-red-600 hover:text-red-900 text-sm md:text-base"
-                                    >
-                                      Delete
-                                    </button>
-                                  )}
-                                </td>
-                              </motion.tr>
-                            ))}
-                          </tbody>
-                        </table>
-                      </div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </motion.div>
-            </motion.div>
-          )}
-
-          {/* Departments Tab */}
-          {activeTab === 'departments' && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.5 }}
-            >
-              <div className="flex justify-between items-center mb-6">
-                <h2 className="text-2xl md:text-3xl font-bold text-gray-800">Departments & Leaders</h2>
-              </div>
-
-              {/* Create Department */}
-              <motion.div 
-                className="bg-white p-4 md:p-6 rounded-xl shadow-md mb-6 md:mb-8"
-                initial={{ y: 20, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                transition={{ delay: 0.2 }}
-              >
-                <div 
-                  className="flex justify-between items-center cursor-pointer"
-                  onClick={() => toggleSection('createDepartment')}
-                >
-                  <h3 className="text-lg md:text-xl font-semibold">
-                    {editingDepartment ? 'Edit Department' : 'Create New Department'}
-                  </h3>
-                  <FiChevronDown className={`transition-transform ${expandedSections.createDepartment ? 'rotate-180' : ''}`} />
-                </div>
-                <AnimatePresence>
-                  {expandedSections.createDepartment && (
-                    <motion.form 
-                      onSubmit={editingDepartment ? updateDepartment : createDepartment}
-                      initial={{ height: 0, opacity: 0 }}
-                      animate={{ height: 'auto', opacity: 1 }}
-                      exit={{ height: 0, opacity: 0 }}
-                      className="overflow-hidden"
-                    >
-                      <div className="grid grid-cols-1 gap-4 mt-4">
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-1">Name</label>
-                          <input
-                            type="text"
-                            name="name"
-                            value={editingDepartment ? editingDepartment.name : newDepartment.name}
-                            onChange={handleDepartmentChange}
-                            className="w-full p-2 border border-gray-300 rounded-md"
-                            required
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-1">Address</label>
-                          <input
-                            type="text"
-                            name="address"
-                            value={editingDepartment ? editingDepartment.address : newDepartment.address}
-                            onChange={handleDepartmentChange}
-                            className="w-full p-2 border border-gray-300 rounded-md"
-                            required
-                          />
-                        </div>
-                      </div>
-                      <div className="mt-4 space-x-2">
-                        <button
-                          type="submit"
-                          className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition"
+                      <li>
+                        <button 
+                          onClick={() => setActiveSection('createAdmin')}
+                          className="flex items-center w-full p-2 rounded-lg hover:bg-indigo-600"
                         >
-                          {editingDepartment ? 'Update Department' : 'Create Department'}
+                          <FiPlus className="mr-2" />
+                          Create Admin
                         </button>
-                        {editingDepartment && (
-                          <button
-                            type="button"
-                            onClick={() => setEditingDepartment(null)}
-                            className="px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600 transition"
-                          >
-                            Cancel
-                          </button>
-                        )}
-                      </div>
-                    </motion.form>
+                      </li>
+                      <li>
+                        <button 
+                          onClick={() => setActiveSection('adminList')}
+                          className="flex items-center w-full p-2 rounded-lg hover:bg-indigo-600"
+                        >
+                          <FiUsers className="mr-2" />
+                          Admin List
+                        </button>
+                      </li>
+                    </motion.ul>
                   )}
                 </AnimatePresence>
-              </motion.div>
-
-              {/* Departments List */}
-              <motion.div 
-                className="bg-white p-4 md:p-6 rounded-xl shadow-md mb-6 md:mb-8"
-                initial={{ y: 20, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                transition={{ delay: 0.4 }}
-              >
+              </li>
+              
+              {/* Department Management Section */}
+              <li>
                 <div 
-                  className="flex justify-between items-center cursor-pointer"
+                  className="flex items-center justify-between p-3 rounded-lg cursor-pointer hover:bg-indigo-700"
                   onClick={() => toggleSection('departments')}
                 >
-                  <h3 className="text-lg md:text-xl font-semibold">All Departments ({departments.length})</h3>
-                  <FiChevronDown className={`transition-transform ${expandedSections.departments ? 'rotate-180' : ''}`} />
+                  <div className="flex items-center">
+                    <FiSettings className="mr-3" />
+                    <span>Departments</span>
+                  </div>
+                  {expandedSections.departments ? <FiChevronUp /> : <FiChevronDown />}
                 </div>
                 <AnimatePresence>
                   {expandedSections.departments && (
-                    <motion.div
+                    <motion.ul
                       initial={{ height: 0, opacity: 0 }}
                       animate={{ height: 'auto', opacity: 1 }}
                       exit={{ height: 0, opacity: 0 }}
-                      className="overflow-hidden"
+                      className="ml-8 mt-1 space-y-1 overflow-hidden"
                     >
-                      <div className="mt-4 overflow-x-auto">
-                        <table className="min-w-full divide-y divide-gray-200">
-                          <thead className="bg-gray-50">
-                            <tr>
-                              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-                              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Address</th>
-                              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-                            </tr>
-                          </thead>
-                          <tbody className="bg-white divide-y divide-gray-200">
-                            {departments.map((dept) => (
-                              <motion.tr
-                                key={dept.department_id}
-                                initial={{ opacity: 0 }}
-                                animate={{ opacity: 1 }}
-                                transition={{ duration: 0.3 }}
-                              >
-                                <td className="px-4 py-4 whitespace-nowrap">{dept.name}</td>
-                                <td className="px-4 py-4 whitespace-nowrap">{dept.address}</td>
-                                <td className="px-4 py-4 whitespace-nowrap space-x-2">
-                                  <button
-                                    onClick={() => setEditingDepartment(dept)}
-                                    className="text-indigo-600 hover:text-indigo-900 text-sm md:text-base"
-                                  >
-                                    Edit
-                                  </button>
-                                  <button
-                                    onClick={() => deleteItem('department', dept.department_id)}
-                                    className="text-red-600 hover:text-red-900 text-sm md:text-base"
-                                  >
-                                    Delete
-                                  </button>
-                                </td>
-                              </motion.tr>
-                            ))}
-                          </tbody>
-                        </table>
-                      </div>
-                    </motion.div>
+                      <li>
+                        <button 
+                          onClick={() => setActiveSection('createDepartment')}
+                          className="flex items-center w-full p-2 rounded-lg hover:bg-indigo-600"
+                        >
+                          <FiPlus className="mr-2" />
+                          Create Department
+                        </button>
+                      </li>
+                      <li>
+                        <button 
+                          onClick={() => setActiveSection('departmentList')}
+                          className="flex items-center w-full p-2 rounded-lg hover:bg-indigo-600"
+                        >
+                          <FiHome className="mr-2" />
+                          Department List
+                        </button>
+                      </li>
+                    </motion.ul>
                   )}
                 </AnimatePresence>
-              </motion.div>
-
-              {/* Create Department Leader */}
-              <motion.div 
-                className="bg-white p-4 md:p-6 rounded-xl shadow-md mb-6 md:mb-8"
-                initial={{ y: 20, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                transition={{ delay: 0.6 }}
-              >
+              </li>
+              
+              {/* Leaders Management Section */}
+              <li>
                 <div 
-                  className="flex justify-between items-center cursor-pointer"
-                  onClick={() => toggleSection('createLeader')}
-                >
-                  <h3 className="text-lg md:text-xl font-semibold">Create New Department Leader</h3>
-                  <FiChevronDown className={`transition-transform ${expandedSections.createLeader ? 'rotate-180' : ''}`} />
-                </div>
-                <AnimatePresence>
-                  {expandedSections.createLeader && (
-                    <motion.form 
-                      onSubmit={createLeader}
-                      initial={{ height: 0, opacity: 0 }}
-                      animate={{ height: 'auto', opacity: 1 }}
-                      exit={{ height: 0, opacity: 0 }}
-                      className="overflow-hidden"
-                    >
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-1">Username</label>
-                          <input
-                            type="text"
-                            name="username"
-                            value={newLeader.username}
-                            onChange={handleLeaderChange}
-                            className="w-full p-2 border border-gray-300 rounded-md"
-                            required
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
-                          <input
-                            type="text"
-                            name="full_name"
-                            value={newLeader.full_name}
-                            onChange={handleLeaderChange}
-                            className="w-full p-2 border border-gray-300 rounded-md"
-                            required
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
-                          <input
-                            type="email"
-                            name="email"
-                            value={newLeader.email}
-                            onChange={handleLeaderChange}
-                            className="w-full p-2 border border-gray-300 rounded-md"
-                            required
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
-                          <input
-                            type="password"
-                            name="password_hash"
-                            value={newLeader.password_hash}
-                            onChange={handleLeaderChange}
-                            className="w-full p-2 border border-gray-300 rounded-md"
-                            required
-                          />
-                        </div>
-                        <div className="md:col-span-2">
-                          <label className="block text-sm font-medium text-gray-700 mb-1">Department</label>
-                          <select
-                            name="department_id"
-                            value={newLeader.department_id}
-                            onChange={handleLeaderChange}
-                            className="w-full p-2 border border-gray-300 rounded-md"
-                            required
-                          >
-                            <option value="">Select Department</option>
-                            {departments.map(dept => (
-                              <option key={dept.department_id} value={dept.department_id}>{dept.name}</option>
-                            ))}
-                          </select>
-                        </div>
-                      </div>
-                      <button
-                        type="submit"
-                        className="mt-4 px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition"
-                      >
-                        Create Leader
-                      </button>
-                    </motion.form>
-                  )}
-                </AnimatePresence>
-              </motion.div>
-
-              {/* Leaders List */}
-              <motion.div 
-                className="bg-white p-4 md:p-6 rounded-xl shadow-md"
-                initial={{ y: 20, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                transition={{ delay: 0.8 }}
-              >
-                <div 
-                  className="flex justify-between items-center cursor-pointer"
+                  className="flex items-center justify-between p-3 rounded-lg cursor-pointer hover:bg-indigo-700"
                   onClick={() => toggleSection('leaders')}
                 >
-                  <h3 className="text-lg md:text-xl font-semibold">All Department Leaders ({leaders.length})</h3>
-                  <FiChevronDown className={`transition-transform ${expandedSections.leaders ? 'rotate-180' : ''}`} />
+                  <div className="flex items-center">
+                    <FiUsers className="mr-3" />
+                    <span>Leaders</span>
+                  </div>
+                  {expandedSections.leaders ? <FiChevronUp /> : <FiChevronDown />}
                 </div>
                 <AnimatePresence>
                   {expandedSections.leaders && (
-                    <motion.div
+                    <motion.ul
                       initial={{ height: 0, opacity: 0 }}
                       animate={{ height: 'auto', opacity: 1 }}
                       exit={{ height: 0, opacity: 0 }}
-                      className="overflow-hidden"
+                      className="ml-8 mt-1 space-y-1 overflow-hidden"
                     >
-                      <div className="mt-4 overflow-x-auto">
-                        <table className="min-w-full divide-y divide-gray-200">
-                          <thead className="bg-gray-50">
-                            <tr>
-                              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-                              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
-                              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Department</th>
-                              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-                            </tr>
-                          </thead>
-                          <tbody className="bg-white divide-y divide-gray-200">
-                            {leaders.map((leader) => {
-                              const department = departments.find(d => d.department_id === leader.department_id);
-                              return (
-                                <motion.tr
-                                  key={leader.leader_id}
-                                  initial={{ opacity: 0 }}
-                                  animate={{ opacity: 1 }}
-                                  transition={{ duration: 0.3 }}
-                                >
-                                  <td className="px-4 py-4 whitespace-nowrap">{leader.fullname || leader.username}</td>
-                                  <td className="px-4 py-4 whitespace-nowrap">{leader.email}</td>
-                                  <td className="px-4 py-4 whitespace-nowrap">
-                                    {department ? department.name : 'Department not found'}
-                                  </td>
-                                  <td className="px-4 py-4 whitespace-nowrap space-x-2">
-                                    <button
-                                      onClick={() => {
-                                        const newPassword = prompt('Enter new password:');
-                                        if (newPassword) editPassword('leader', leader.leader_id, newPassword);
-                                      }}
-                                      className="text-indigo-600 hover:text-indigo-900 text-sm md:text-base"
-                                    >
-                                      Change Password
-                                    </button>
-                                    <button
-                                      onClick={() => deleteItem('leader', leader.leader_id)}
-                                      className="text-red-600 hover:text-red-900 text-sm md:text-base"
-                                    >
-                                      Delete
-                                    </button>
-                                  </td>
-                                </motion.tr>
-                              );
-                            })}
-                          </tbody>
-                        </table>
-                      </div>
-                    </motion.div>
+                      <li>
+                        <button 
+                          onClick={() => setActiveSection('createLeader')}
+                          className="flex items-center w-full p-2 rounded-lg hover:bg-indigo-600"
+                        >
+                          <FiPlus className="mr-2" />
+                          Create Leader
+                        </button>
+                      </li>
+                      <li>
+                        <button 
+                          onClick={() => setActiveSection('leaderList')}
+                          className="flex items-center w-full p-2 rounded-lg hover:bg-indigo-600"
+                        >
+                          <FiUsers className="mr-2" />
+                          Leader List
+                        </button>
+                      </li>
+                    </motion.ul>
                   )}
                 </AnimatePresence>
-              </motion.div>
-            </motion.div>
-          )}
-
-          {/* Requests Tab */}
-          {activeTab === 'requests' && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.5 }}
-            >
-              <div className="flex justify-between items-center mb-6">
-                <h2 className="text-2xl md:text-3xl font-bold text-gray-800">Requests Management</h2>
-              </div>
-
-              {/* Create Request Type */}
-              <motion.div 
-                className="bg-white p-4 md:p-6 rounded-xl shadow-md mb-6 md:mb-8"
-                initial={{ y: 20, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                transition={{ delay: 0.2 }}
-              >
+              </li>
+              
+              {/* Requests Management Section */}
+              <li>
                 <div 
-                  className="flex justify-between items-center cursor-pointer"
-                  onClick={() => toggleSection('createRequestType')}
-                >
-                  <h3 className="text-lg md:text-xl font-semibold">Create New Request Type</h3>
-                  <FiChevronDown className={`transition-transform ${expandedSections.createRequestType ? 'rotate-180' : ''}`} />
-                </div>
-                <AnimatePresence>
-                  {expandedSections.createRequestType && (
-                    <motion.form 
-                      onSubmit={createRequestType}
-                      initial={{ height: 0, opacity: 0 }}
-                      animate={{ height: 'auto', opacity: 1 }}
-                      exit={{ height: 0, opacity: 0 }}
-                      className="overflow-hidden"
-                    >
-                      <div className="grid grid-cols-1 gap-4 mt-4">
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-1">Name</label>
-                          <input
-                            type="text"
-                            name="name"
-                            value={newRequestType.name}
-                            onChange={handleRequestTypeChange}
-                            className="w-full p-2 border border-gray-300 rounded-md"
-                            required
-                          />
-                        </div>
-                      </div>
-                      <button
-                        type="submit"
-                        className="mt-4 px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition"
-                      >
-                        Create Request Type
-                      </button>
-                    </motion.form>
-                  )}
-                </AnimatePresence>
-              </motion.div>
-
-              {/* Request Types List */}
-              <motion.div 
-                className="bg-white p-4 md:p-6 rounded-xl shadow-md mb-6 md:mb-8"
-                initial={{ y: 20, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                transition={{ delay: 0.4 }}
-              >
-                <div 
-                  className="flex justify-between items-center cursor-pointer"
-                  onClick={() => toggleSection('requestTypes')}
-                >
-                  <h3 className="text-lg md:text-xl font-semibold">Request Types ({requestTypes.length})</h3>
-                  <FiChevronDown className={`transition-transform ${expandedSections.requestTypes ? 'rotate-180' : ''}`} />
-                </div>
-                <AnimatePresence>
-                  {expandedSections.requestTypes && (
-                    <motion.div
-                      initial={{ height: 0, opacity: 0 }}
-                      animate={{ height: 'auto', opacity: 1 }}
-                      exit={{ height: 0, opacity: 0 }}
-                      className="overflow-hidden"
-                    >
-                      <div className="mt-4 overflow-x-auto">
-                        <table className="min-w-full divide-y divide-gray-200">
-                          <thead className="bg-gray-50">
-                            <tr>
-                              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-                              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-                            </tr>
-                          </thead>
-                          <tbody className="bg-white divide-y divide-gray-200">
-                            {requestTypes.map((type) => (
-                              <motion.tr
-                                key={type.id}
-                                initial={{ opacity: 0 }}
-                                animate={{ opacity: 1 }}
-                                transition={{ duration: 0.3 }}
-                              >
-                                <td className="px-4 py-4 whitespace-nowrap">{type.name}</td>
-                                <td className="px-4 py-4 whitespace-nowrap">
-                                  <button
-                                    onClick={() => deleteItem('requestType', type.id)}
-                                    className="text-red-600 hover:text-red-900 text-sm md:text-base"
-                                  >
-                                    Delete
-                                  </button>
-                                </td>
-                              </motion.tr>
-                            ))}
-                          </tbody>
-                        </table>
-                      </div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </motion.div>
-
-              {/* Requests List */}
-              <motion.div 
-                className="bg-white p-4 md:p-6 rounded-xl shadow-md"
-                initial={{ y: 20, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                transition={{ delay: 0.6 }}
-              >
-                <div 
-                  className="flex justify-between items-center cursor-pointer"
+                  className="flex items-center justify-between p-3 rounded-lg cursor-pointer hover:bg-indigo-700"
                   onClick={() => toggleSection('requests')}
                 >
-                  <h3 className="text-lg md:text-xl font-semibold">All Requests ({requests.length})</h3>
-                  <FiChevronDown className={`transition-transform ${expandedSections.requests ? 'rotate-180' : ''}`} />
+                  <div className="flex items-center">
+                    <FiFileText className="mr-3" />
+                    <span>Requests</span>
+                  </div>
+                  {expandedSections.requests ? <FiChevronUp /> : <FiChevronDown />}
                 </div>
                 <AnimatePresence>
                   {expandedSections.requests && (
-                    <motion.div
+                    <motion.ul
                       initial={{ height: 0, opacity: 0 }}
                       animate={{ height: 'auto', opacity: 1 }}
                       exit={{ height: 0, opacity: 0 }}
-                      className="overflow-hidden"
+                      className="ml-8 mt-1 space-y-1 overflow-hidden"
                     >
-                      <div className="mt-4 overflow-x-auto">
-                        <table className="min-w-full divide-y divide-gray-200">
-                          <thead className="bg-gray-50">
-                            <tr>
-                              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Title</th>
-                              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Request Type</th>
-                              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Department</th>
-                              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Description</th>
-                              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-                            </tr>
-                          </thead>
-                          <tbody className="bg-white divide-y divide-gray-200">
-                            {requests.map((request) => {
-                              const requestType = requestTypes.find(rt => rt.id === request.request_type_id);
-                              const department = departments.find(d => d.department_id === request.department_id);
-                              return (
-                                <motion.tr
-                                  key={request.request_id}
-                                  initial={{ opacity: 0 }}
-                                  animate={{ opacity: 1 }}
-                                  transition={{ duration: 0.3 }}
-                                >
-                                  <td className="px-4 py-4 whitespace-nowrap">{request.title}</td>
-                                  <td className="px-4 py-4 whitespace-nowrap">
-                                    {requestType ? requestType.name : 'Unknown'}
-                                  </td>
-                                  <td className="px-4 py-4 whitespace-nowrap">
-                                    {department ? department.name : 'Unknown'}
-                                  </td>
-                                  <td className="px-4 py-4">
-                                    <div className="max-w-xs truncate" title={request.description}>
-                                      {request.description}
-                                    </div>
-                                  </td>
-                                  <td className="px-4 py-4 whitespace-nowrap">
-                                    <span className={`px-2 py-1 text-xs rounded-full ${
-                                      request.status === 'Pending' ? 'bg-yellow-100 text-yellow-800' :
-                                      request.status === 'Accepted' ? 'bg-blue-100 text-blue-800' :
-                                      'bg-green-100 text-green-800'
-                                    }`}>
-                                      {request.status || 'Pending'}
-                                    </span>
-                                  </td>
-                                  <td className="px-4 py-4 whitespace-nowrap">
-                                    <select
-                                      value={request.status || 'Pending'}
-                                      onChange={(e) => updateRequestStatus(request.request_id, e.target.value)}
-                                      className="p-1 border border-gray-300 rounded-md text-sm"
-                                    >
-                                      <option value="Pending">Pending</option>
-                                      <option value="Accepted">Accepted</option>
-                                      <option value="Finished">Finished</option>
-                                    </select>
-                                  </td>
-                                </motion.tr>
-                              );
-                            })}
-                          </tbody>
-                        </table>
-                      </div>
-                    </motion.div>
+                      <li>
+                        <button 
+                          onClick={() => setActiveSection('requestList')}
+                          className="flex items-center w-full p-2 rounded-lg hover:bg-indigo-600"
+                        >
+                          <FiFileText className="mr-2" />
+                          All Requests
+                        </button>
+                      </li>
+                    </motion.ul>
                   )}
                 </AnimatePresence>
-              </motion.div>
-            </motion.div>
-          )}
+              </li>
+              
+              {/* Request Types Section */}
+              <li>
+                <div 
+                  className="flex items-center justify-between p-3 rounded-lg cursor-pointer hover:bg-indigo-700"
+                  onClick={() => toggleSection('requestTypes')}
+                >
+                  <div className="flex items-center">
+                    <FiFileText className="mr-3" />
+                    <span>Request Types</span>
+                  </div>
+                  {expandedSections.requestTypes ? <FiChevronUp /> : <FiChevronDown />}
+                </div>
+                <AnimatePresence>
+                  {expandedSections.requestTypes && (
+                    <motion.ul
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: 'auto', opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      className="ml-8 mt-1 space-y-1 overflow-hidden"
+                    >
+                      <li>
+                        <button 
+                          onClick={() => setActiveSection('createRequestType')}
+                          className="flex items-center w-full p-2 rounded-lg hover:bg-indigo-600"
+                        >
+                          <FiPlus className="mr-2" />
+                          Create Type
+                        </button>
+                      </li>
+                      <li>
+                        <button 
+                          onClick={() => setActiveSection('requestTypeList')}
+                          className="flex items-center w-full p-2 rounded-lg hover:bg-indigo-600"
+                        >
+                          <FiFileText className="mr-2" />
+                          Type List
+                        </button>
+                      </li>
+                    </motion.ul>
+                  )}
+                </AnimatePresence>
+              </li>
+              
+              {/* Hall Reservations */}
+              <li>
+                <button 
+                 onClick={handleCalendlyClick}
+                  className={`flex items-center w-full p-3 rounded-lg transition ${activeSection === 'reservations' ? 'bg-indigo-700' : 'hover:bg-indigo-700'}`}
+                >
+                  <FiCalendar className="mr-3" />
+                  Hall Reservations
+                </button>
+              </li>
+            </motion.ul>
+          </nav>
 
-          {/* Reservations Tab */}
-          {activeTab === 'reservations' && (
+          <motion.div 
+            className="mt-auto bg-white bg-opacity-10 p-4 rounded-lg"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.6 }}
+          >
+            <div className="text-white text-sm">
+              <p className="font-medium">Need help?</p>
+              <p className="text-white text-opacity-70">Contact our support team</p>
+            </div>
+          </motion.div>
+        </div>
+      </animated.div>
+
+      {/* Main Content */}
+      <div className="flex-1 overflow-auto">
+        {/* Header */}
+        <header className="bg-white shadow-sm p-4">
+          <div className="flex items-center justify-between">
+            <motion.button
+              onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.9 }}
+              className="p-2 rounded-lg bg-gray-100"
+            >
+              <FiMenu size={20} />
+            </motion.button>
+
+            <div className="flex items-center space-x-4">
+              <motion.button
+                onClick={fetchAllData}
+                whileHover={{ rotate: 180 }}
+                whileTap={{ scale: 0.9 }}
+                className="p-2 rounded-lg bg-gray-100"
+              >
+                <FiRefreshCw size={20} />
+              </motion.button>
+            </div>
+          </div>
+        </header>
+
+        {/* Dashboard Content */}
+        <main className="p-6">
+          {/* Dashboard Section */}
+          {activeSection === 'dashboard' && (
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.5 }}
             >
-              <div className="flex justify-between items-center mb-6">
-                <h2 className="text-2xl md:text-3xl font-bold text-gray-800">Hall Reservations</h2>
+              <h2 className="text-2xl md:text-3xl font-bold mb-6 text-gray-800">Dashboard Overview</h2>
+              
+              {/* Stats Cards */}
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+                <animated.div 
+                  style={cardAnimation}
+                  className="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition-shadow"
+                >
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-gray-500">Total Requests</p>
+                      <h3 className="text-3xl font-bold text-indigo-600">{stats.total}</h3>
+                    </div>
+                    <div className="p-3 rounded-full bg-indigo-100 text-indigo-600">
+                      📋
+                    </div>
+                  </div>
+                </animated.div>
+
+                <animated.div 
+                  style={cardAnimation}
+                  className="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition-shadow"
+                >
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-gray-500">Pending</p>
+                      <h3 className="text-3xl font-bold text-yellow-600">{stats.pending}</h3>
+                    </div>
+                    <div className="p-3 rounded-full bg-yellow-100 text-yellow-600">
+                      <FiClock size={24} />
+                    </div>
+                  </div>
+                </animated.div>
+
+                <animated.div 
+                  style={cardAnimation}
+                  className="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition-shadow"
+                >
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-gray-500">Accepted</p>
+                      <h3 className="text-3xl font-bold text-green-600">{stats.accepted}</h3>
+                    </div>
+                    <div className="p-3 rounded-full bg-green-100 text-green-600">
+                      <FiCheck size={24} />
+                    </div>
+                  </div>
+                </animated.div>
+
+                <animated.div 
+                  style={cardAnimation}
+                  className="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition-shadow"
+                >
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-gray-500">Rejected</p>
+                      <h3 className="text-3xl font-bold text-red-600">{stats.rejected}</h3>
+                    </div>
+                    <div className="p-3 rounded-full bg-red-100 text-red-600">
+                      <FiSlash size={24} />
+                    </div>
+                  </div>
+                </animated.div>
               </div>
 
-              <motion.div 
-                className="bg-white p-4 md:p-6 rounded-xl shadow-md"
-                initial={{ y: 20, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                transition={{ delay: 0.2 }}
-              >
-                <div 
-                  className="flex justify-between items-center cursor-pointer"
-                  onClick={() => toggleSection('reservations')}
-                >
-                  <h3 className="text-lg md:text-xl font-semibold">All Reservations ({reservations.length})</h3>
-                  <FiChevronDown className={`transition-transform ${expandedSections.reservations ? 'rotate-180' : ''}`} />
+              {/* Chart */}
+              <div className="bg-white p-6 rounded-xl shadow-md lg:col-span-1 mb-8">
+                <h3 className="text-lg font-semibold mb-4">Request Status Distribution</h3>
+                <div className="h-64">
+                  <canvas id="requestChart"></canvas>
                 </div>
-                <AnimatePresence>
-                  {expandedSections.reservations && (
-                    <motion.div
-                      initial={{ height: 0, opacity: 0 }}
-                      animate={{ height: 'auto', opacity: 1 }}
-                      exit={{ height: 0, opacity: 0 }}
-                      className="overflow-hidden"
-                    >
-                      <div className="mt-4 overflow-x-auto">
-                        <table className="min-w-full divide-y divide-gray-200">
-                          <thead className="bg-gray-50">
-                            <tr>
-                              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Event Name</th>
-                              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Department</th>
-                              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Start Time</th>
-                              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">End Time</th>
-                              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                            </tr>
-                          </thead>
-                          <tbody className="bg-white divide-y divide-gray-200">
-                            {reservations.map((reservation) => {
-                              const department = departments.find(d => d.department_id === reservation.department_id);
-                              return (
-                                <motion.tr
-                                  key={reservation.reservation_id}
-                                  initial={{ opacity: 0 }}
-                                  animate={{ opacity: 1 }}
-                                  transition={{ duration: 0.3 }}
-                                >
-                                  <td className="px-4 py-4 whitespace-nowrap">{reservation.event_name}</td>
-                                  <td className="px-4 py-4 whitespace-nowrap">
-                                    {department ? department.name : 'Unknown'}
-                                  </td>
-                                  <td className="px-4 py-4 whitespace-nowrap">
-                                    {new Date(reservation.start_time).toLocaleString()}
-                                  </td>
-                                  <td className="px-4 py-4 whitespace-nowrap">
-                                    {new Date(reservation.end_time).toLocaleString()}
-                                  </td>
-                                  <td className="px-4 py-4 whitespace-nowrap">
-                                    <span className={`px-2 py-1 text-xs rounded-full ${
-                                      reservation.status === 'Pending' ? 'bg-yellow-100 text-yellow-800' :
-                                      reservation.status === 'Approved' ? 'bg-green-100 text-green-800' :
-                                      'bg-red-100 text-red-800'
-                                    }`}>
-                                      {reservation.status}
-                                    </span>
-                                  </td>
-                                </motion.tr>
-                              );
-                            })}
-                          </tbody>
-                        </table>
-                      </div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </motion.div>
+              </div>
             </motion.div>
           )}
-        </div>
-      </motion.div>
-    </motion.div>
+
+          {/* Create Admin Section */}
+          {activeSection === 'createAdmin' && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.5 }}
+            >
+              <h2 className="text-2xl md:text-3xl font-bold mb-6 text-gray-800">Create New Admin</h2>
+              
+              <div className="bg-white p-6 rounded-xl shadow-md">
+                <form onSubmit={createAdmin}>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Username</label>
+                      <input
+                        type="text"
+                        name="username"
+                        value={newAdmin.username}
+                        onChange={handleAdminChange}
+                        className="w-full p-2 border border-gray-300 rounded-md"
+                        required
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                      <input
+                        type="email"
+                        name="email"
+                        value={newAdmin.email}
+                        onChange={handleAdminChange}
+                        className="w-full p-2 border border-gray-300 rounded-md"
+                        required
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
+                      <input
+                        type="password"
+                        name="password_hash"
+                        value={newAdmin.password_hash}
+                        onChange={handleAdminChange}
+                        className="w-full p-2 border border-gray-300 rounded-md"
+                        required
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Phone Number</label>
+                      <input
+                        type="tel"
+                        name="phone_number"
+                        value={newAdmin.phone_number}
+                        onChange={handleAdminChange}
+                        className="w-full p-2 border border-gray-300 rounded-md"
+                        required
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Role</label>
+                      <select
+                        name="role"
+                        value={newAdmin.role}
+                        onChange={handleAdminChange}
+                        className="w-full p-2 border border-gray-300 rounded-md"
+                        required
+                      >
+                        <option value="subadmin">Subadmin</option>
+                        <option value="mainadmin">Main Admin</option>
+                      </select>
+                    </div>
+                  </div>
+                  <button
+                    type="submit"
+                    className="mt-6 px-6 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition"
+                  >
+                    Create Admin
+                  </button>
+                </form>
+              </div>
+            </motion.div>
+          )}
+
+          {/* Admin List Section */}
+          {activeSection === 'adminList' && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.5 }}
+            >
+              <h2 className="text-2xl md:text-3xl font-bold mb-6 text-gray-800">Admin List</h2>
+              
+              <div className="bg-white p-6 rounded-xl shadow-md overflow-x-auto">
+                <table className="min-w-full divide-y divide-gray-200">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Username</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Phone</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Role</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-200">
+                    {admins.map((admin) => (
+                      <tr key={admin.admin_id}>
+                        <td className="px-6 py-4 whitespace-nowrap">{admin.username}</td>
+                        <td className="px-6 py-4 whitespace-nowrap">{admin.email}</td>
+                        <td className="px-6 py-4 whitespace-nowrap">{admin.phone_number}</td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <span className={`px-2 py-1 text-xs rounded-full ${
+                            admin.role === 'mainadmin' ? 'bg-purple-100 text-purple-800' : 'bg-blue-100 text-blue-800'
+                          }`}>
+                            {admin.role}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap space-x-2">
+                          <button
+                            onClick={() => openPasswordDialog('admin', admin.admin_id)}
+                            className="text-indigo-600 hover:text-indigo-900"
+                          >
+                            <FiKey className="inline mr-1" /> Change Password
+                          </button>
+                          {admin.role !== 'mainadmin' && (
+                            <button
+                              onClick={() => confirmDelete('admin', admin.admin_id)}
+                              className="text-red-600 hover:text-red-900"
+                            >
+                              <FiTrash2 className="inline mr-1" /> Delete
+                            </button>
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </motion.div>
+          )}
+
+          {/* Create Department Section */}
+          {activeSection === 'createDepartment' && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.5 }}
+            >
+              <h2 className="text-2xl md:text-3xl font-bold mb-6 text-gray-800">
+                {editingDepartment ? 'Edit Department' : 'Create New Department'}
+              </h2>
+              
+              <div className="bg-white p-6 rounded-xl shadow-md">
+                <form onSubmit={editingDepartment ? updateDepartment : createDepartment}>
+                  <div className="grid grid-cols-1 gap-6">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Name</label>
+                      <input
+                        type="text"
+                        name="name"
+                        value={editingDepartment ? editingDepartment.name : newDepartment.name}
+                        onChange={handleDepartmentChange}
+                        className="w-full p-2 border border-gray-300 rounded-md"
+                        required
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Address</label>
+                      <input
+                        type="text"
+                        name="address"
+                        value={editingDepartment ? editingDepartment.address : newDepartment.address}
+                        onChange={handleDepartmentChange}
+                        className="w-full p-2 border border-gray-300 rounded-md"
+                        required
+                      />
+                    </div>
+                  </div>
+                  <div className="mt-6 space-x-3">
+                    <button
+                      type="submit"
+                      className="px-6 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition"
+                    >
+                      {editingDepartment ? 'Update Department' : 'Create Department'}
+                    </button>
+                    {editingDepartment && (
+                      <button
+                        type="button"
+                        onClick={() => setEditingDepartment(null)}
+                        className="px-6 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600 transition"
+                      >
+                        Cancel
+                      </button>
+                    )}
+                  </div>
+                </form>
+              </div>
+            </motion.div>
+          )}
+
+          {/* Department List Section */}
+          {activeSection === 'departmentList' && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.5 }}
+            >
+              <h2 className="text-2xl md:text-3xl font-bold mb-6 text-gray-800">Department List</h2>
+              
+              <div className="bg-white p-6 rounded-xl shadow-md overflow-x-auto">
+                <table className="min-w-full divide-y divide-gray-200">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Address</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-200">
+                    {departments.map((department) => (
+                      <tr key={department.department_id}>
+                        <td className="px-6 py-4 whitespace-nowrap">{department.name}</td>
+                        <td className="px-6 py-4 whitespace-nowrap">{department.address}</td>
+                        <td className="px-6 py-4 whitespace-nowrap space-x-2">
+                          <button
+                            onClick={() => setEditingDepartment(department)}
+                            className="text-indigo-600 hover:text-indigo-900"
+                          >
+                            <FiEdit className="inline mr-1" /> Edit
+                          </button>
+                          <button
+                            onClick={() => confirmDelete('department', department.department_id)}
+                            className="text-red-600 hover:text-red-900"
+                          >
+                            <FiTrash2 className="inline mr-1" /> Delete
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </motion.div>
+          )}
+
+          {/* Create Leader Section */}
+          {activeSection === 'createLeader' && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.5 }}
+            >
+              <h2 className="text-2xl md:text-3xl font-bold mb-6 text-gray-800">Create New Department Leader</h2>
+              
+              <div className="bg-white p-6 rounded-xl shadow-md">
+                <form onSubmit={createLeader}>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Username</label>
+                      <input
+                        type="text"
+                        name="username"
+                        value={newLeader.username}
+                        onChange={handleLeaderChange}
+                        className="w-full p-2 border border-gray-300 rounded-md"
+                        required
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
+                      <input
+                        type="text"
+                        name="full_name"
+                        value={newLeader.full_name}
+                        onChange={handleLeaderChange}
+                        className="w-full p-2 border border-gray-300 rounded-md"
+                        required
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                      <input
+                        type="email"
+                        name="email"
+                        value={newLeader.email}
+                        onChange={handleLeaderChange}
+                        className="w-full p-2 border border-gray-300 rounded-md"
+                        required
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Phone Number</label>
+                      <input
+                        type="tel"
+                        name="phone_number"
+                        value={newLeader.phone_number}
+                        onChange={handleLeaderChange}
+                        className="w-full p-2 border border-gray-300 rounded-md"
+                        required
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
+                      <input
+                        type="password"
+                        name="password_hash"
+                        value={newLeader.password_hash}
+                        onChange={handleLeaderChange}
+                        className="w-full p-2 border border-gray-300 rounded-md"
+                        required
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Department</label>
+                      <select
+                        name="department_id"
+                        value={newLeader.department_id}
+                        onChange={handleLeaderChange}
+                        className="w-full p-2 border border-gray-300 rounded-md"
+                        required
+                      >
+                        <option value="">Select Department</option>
+                        {departments.map(dept => (
+                          <option key={dept.department_id} value={dept.department_id}>{dept.name}</option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
+                  <button
+                    type="submit"
+                    className="mt-6 px-6 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition"
+                  >
+                    Create Leader
+                  </button>
+                </form>
+              </div>
+            </motion.div>
+          )}
+
+          {/* Leader List Section */}
+          {activeSection === 'leaderList' && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.5 }}
+            >
+              <h2 className="text-2xl md:text-3xl font-bold mb-6 text-gray-800">Department Leaders</h2>
+              
+              <div className="bg-white p-6 rounded-xl shadow-md overflow-x-auto">
+                <table className="min-w-full divide-y divide-gray-200">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Phone</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Department</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-200">
+                    {leaders.map((leader) => {
+                      const department = departments.find(d => d.department_id === leader.department_id);
+                      return (
+                        <tr key={leader.leader_id}>
+                          <td className="px-6 py-4 whitespace-nowrap">{leader.full_name || leader.username}</td>
+                          <td className="px-6 py-4 whitespace-nowrap">{leader.email}</td>
+                          <td className="px-6 py-4 whitespace-nowrap">{leader.phone_number}</td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            {department ? department.name : 'Not assigned'}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap space-x-2">
+                            <button
+                              onClick={() => openPasswordDialog('leader', leader.leader_id)}
+                              className="text-indigo-600 hover:text-indigo-900"
+                            >
+                              <FiKey className="inline mr-1" /> Change Password
+                            </button>
+                            <button
+                              onClick={() => confirmDelete('leader', leader.leader_id)}
+                              className="text-red-600 hover:text-red-900"
+                            >
+                              <FiTrash2 className="inline mr-1" /> Delete
+                            </button>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            </motion.div>
+          )}
+
+          {/* Request List Section */}
+          {activeSection === 'requestList' && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.5 }}
+            >
+              <h2 className="text-2xl md:text-3xl font-bold mb-6 text-gray-800">All Requests</h2>
+              
+              <div className="bg-white p-6 rounded-xl shadow-md overflow-x-auto">
+                <table className="min-w-full divide-y divide-gray-200">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Title</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Department</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-200">
+                    {requests.map((request) => {
+                      const requestType = requestTypes.find(rt => rt.request_type_id === request.request_type_id);
+                      const department = departments.find(d => d.department_id === request.department_id);
+                      return (
+                        <tr key={request.request_id}>
+                          <td className="px-6 py-4 whitespace-nowrap">{request.title}</td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            {requestType ? requestType.name : 'Unknown'}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            {department ? department.name : 'Unknown'}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <StatusBadge status={request.status} />
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <select
+                              value={request.status}
+                              onChange={(e) => updateRequestStatus(request.request_id, e.target.value)}
+                              className="p-2 border border-gray-300 rounded-md"
+                            >
+                              <option value="Pending">Pending</option>
+                              <option value="Accepted">Accepted</option>
+                              <option value="Rejected">Rejected</option>
+                            </select>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            </motion.div>
+          )}
+
+          {/* Create Request Type Section */}
+          {activeSection === 'createRequestType' && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.5 }}
+            >
+              <h2 className="text-2xl md:text-3xl font-bold mb-6 text-gray-800">Create New Request Type</h2>
+              
+              <div className="bg-white p-6 rounded-xl shadow-md">
+                <form onSubmit={createRequestType}>
+                  <div className="grid grid-cols-1 gap-6">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Name</label>
+                      <input
+                        type="text"
+                        name="name"
+                        value={newRequestType.name}
+                        onChange={handleRequestTypeChange}
+                        className="w-full p-2 border border-gray-300 rounded-md"
+                        required
+                      />
+                    </div>
+                  </div>
+                  <button
+                    type="submit"
+                    className="mt-6 px-6 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition"
+                  >
+                    Create Request Type
+                  </button>
+                </form>
+              </div>
+            </motion.div>
+          )}
+
+          {/* Request Type List Section */}
+          {activeSection === 'requestTypeList' && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.5 }}
+            >
+              <h2 className="text-2xl md:text-3xl font-bold mb-6 text-gray-800">Request Types</h2>
+              
+              <div className="bg-white p-6 rounded-xl shadow-md overflow-x-auto">
+                <table className="min-w-full divide-y divide-gray-200">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-200">
+                    {requestTypes.map((type) => (
+                      <tr key={type.request_type_id}>
+                        <td className="px-6 py-4 whitespace-nowrap">{type.name}</td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <button
+                            onClick={() => confirmDelete('requestType', type.request_type_id)}
+                            className="text-red-600 hover:text-red-900"
+                          >
+                            <FiTrash2 className="inline mr-1" /> Delete
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </motion.div>
+          )}
+
+          {/* Hall Reservations Section */}
+          {activeSection === 'reservations' && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.5 }}
+            >
+              <h2 className="text-2xl md:text-3xl font-bold mb-6 text-gray-800">Hall Reservations</h2>
+              
+              <div className="bg-white p-6 rounded-xl shadow-md">
+                <div className="mb-6">
+                  <button
+                    onClick={openCalendlyWidget}
+                    className="px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition flex items-center"
+                  >
+                    <FiCalendar className="mr-2" />
+                    Schedule Hall Reservation
+                  </button>
+                </div>
+                
+                <div className="mt-6">
+                  <h3 className="text-lg font-semibold mb-4">Reservation Instructions</h3>
+                  <div className="prose">
+                    <ol className="list-decimal pl-5 space-y-2">
+                      <li>Click the button above to select an available time slot</li>
+                      <li>Fill in your department name and purpose of reservation</li>
+                      <li>Submit the form to reserve the hall</li>
+                      <li>You will receive a confirmation email with reservation details</li>
+                    </ol>
+                    <p className="mt-4 text-sm text-gray-600">
+                      Note: Each department can reserve the hall for a maximum of 4 hours per day.
+                      Double bookings are automatically prevented by the system.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </main>
+      </div>
+
+      {/* Delete Confirmation Dialog */}
+      <Transition appear show={isDeleteDialogOpen} as={Fragment}>
+        <Dialog as="div" className="relative z-50" onClose={() => setIsDeleteDialogOpen(false)}>
+          <Transition.Child
+            as={Fragment}
+            enter="ease-out duration-300"
+            enterFrom="opacity-0"
+            enterTo="opacity-100"
+            leave="ease-in duration-200"
+            leaveFrom="opacity-100"
+            leaveTo="opacity-0"
+          >
+            <div className="fixed inset-0 bg-black bg-opacity-25" />
+          </Transition.Child>
+
+          <div className="fixed inset-0 overflow-y-auto">
+            <div className="flex min-h-full items-center justify-center p-4 text-center">
+              <Transition.Child
+                as={Fragment}
+                enter="ease-out duration-300"
+                enterFrom="opacity-0 scale-95"
+                enterTo="opacity-100 scale-100"
+                leave="ease-in duration-200"
+                leaveFrom="opacity-100 scale-100"
+                leaveTo="opacity-0 scale-95"
+              >
+                <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
+                  <Dialog.Title
+                    as="h3"
+                    className="text-lg font-medium leading-6 text-gray-900"
+                  >
+                    Confirm Deletion
+                  </Dialog.Title>
+                  <div className="mt-2">
+                    <p className="text-sm text-gray-500">
+                      Are you sure you want to delete this {deleteItemType}? This action cannot be undone.
+                    </p>
+                  </div>
+
+                  <div className="mt-4 flex justify-end space-x-3">
+                    <button
+                      type="button"
+                      className="inline-flex justify-center rounded-md border border-transparent bg-gray-100 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-500 focus-visible:ring-offset-2"
+                      onClick={() => setIsDeleteDialogOpen(false)}
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="button"
+                      className="inline-flex justify-center rounded-md border border-transparent bg-red-100 px-4 py-2 text-sm font-medium text-red-900 hover:bg-red-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-2"
+                      onClick={deleteItem}
+                    >
+                      Delete
+                    </button>
+                  </div>
+                </Dialog.Panel>
+              </Transition.Child>
+            </div>
+          </div>
+        </Dialog>
+      </Transition>
+
+      {/* Password Change Dialog */}
+      <Transition appear show={isPasswordDialogOpen} as={Fragment}>
+        <Dialog as="div" className="relative z-50" onClose={() => setIsPasswordDialogOpen(false)}>
+          <Transition.Child
+            as={Fragment}
+            enter="ease-out duration-300"
+            enterFrom="opacity-0"
+            enterTo="opacity-100"
+            leave="ease-in duration-200"
+            leaveFrom="opacity-100"
+            leaveTo="opacity-0"
+          >
+            <div className="fixed inset-0 bg-black bg-opacity-25" />
+          </Transition.Child>
+
+          <div className="fixed inset-0 overflow-y-auto">
+            <div className="flex min-h-full items-center justify-center p-4 text-center">
+              <Transition.Child
+                as={Fragment}
+                enter="ease-out duration-300"
+                enterFrom="opacity-0 scale-95"
+                enterTo="opacity-100 scale-100"
+                leave="ease-in duration-200"
+                leaveFrom="opacity-100 scale-100"
+                leaveTo="opacity-0 scale-95"
+              >
+                <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
+                  <Dialog.Title
+                    as="h3"
+                    className="text-lg font-medium leading-6 text-gray-900"
+                  >
+                    Change Password
+                  </Dialog.Title>
+                  <div className="mt-4 space-y-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Current Password</label>
+                      <input
+                        type="password"
+                        value={passwordForm.currentPassword}
+                        onChange={(e) => setPasswordForm({...passwordForm, currentPassword: e.target.value})}
+                        className="w-full p-2 border border-gray-300 rounded-md"
+                        required
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">New Password</label>
+                      <input
+                        type="password"
+                        value={passwordForm.newPassword}
+                        onChange={(e) => setPasswordForm({...passwordForm, newPassword: e.target.value})}
+                        className="w-full p-2 border border-gray-300 rounded-md"
+                        required
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Confirm New Password</label>
+                      <input
+                        type="password"
+                        value={passwordForm.confirmPassword}
+                        onChange={(e) => setPasswordForm({...passwordForm, confirmPassword: e.target.value})}
+                        className="w-full p-2 border border-gray-300 rounded-md"
+                        required
+                      />
+                    </div>
+                    {passwordError && (
+                      <div className="text-red-500 text-sm">{passwordError}</div>
+                    )}
+                  </div>
+
+                  <div className="mt-6 flex justify-end space-x-3">
+                    <button
+                      type="button"
+                      className="inline-flex justify-center rounded-md border border-transparent bg-gray-100 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-500 focus-visible:ring-offset-2"
+                      onClick={() => setIsPasswordDialogOpen(false)}
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="button"
+                      className="inline-flex justify-center rounded-md border border-transparent bg-indigo-100 px-4 py-2 text-sm font-medium text-indigo-900 hover:bg-indigo-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2"
+                      onClick={changePassword}
+                    >
+                      Change Password
+                    </button>
+                  </div>
+                </Dialog.Panel>
+              </Transition.Child>
+            </div>
+          </div>
+        </Dialog>
+      </Transition>
+    </div>
   );
 };
 
