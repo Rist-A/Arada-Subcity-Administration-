@@ -4,6 +4,13 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { FiEye, FiEyeOff, FiLock, FiMail, FiAlertCircle, FiCheckCircle, FiClock } from 'react-icons/fi';
 
+// Color Theme
+const primaryColor = '#136b5c';
+const secondaryColor = '#6d9f9a';
+const accentColor = '#18b3ac';
+const lightColor = '#f0f9f8';
+const darkColor = '#0a2524';
+
 // Enhanced Animations
 const fadeIn = keyframes`
   from { opacity: 0; transform: translateY(20px); }
@@ -46,6 +53,7 @@ const LoginContainer = styled.div`
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   overflow: hidden;
   position: relative;
+  background: ${lightColor};
   
   @media (max-width: 768px) {
     flex-direction: column;
@@ -65,12 +73,13 @@ const FloatingOrbs = styled.div`
     border-radius: 50%;
     filter: blur(60px);
     animation: ${float} 15s ease-in-out infinite;
+    opacity: 0.6;
   }
   
   &::before {
     width: 300px;
     height: 300px;
-    background: rgba(104, 107, 255, 0.4);
+    background: ${primaryColor};
     top: 20%;
     left: 10%;
     animation-delay: 0s;
@@ -79,7 +88,7 @@ const FloatingOrbs = styled.div`
   &::after {
     width: 400px;
     height: 400px;
-    background: rgba(255, 107, 107, 0.3);
+    background: ${secondaryColor};
     bottom: 10%;
     right: 10%;
     animation-delay: 2.5s;
@@ -88,7 +97,7 @@ const FloatingOrbs = styled.div`
 
 const LeftPanel = styled.div`
   flex: 1;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, ${primaryColor} 0%, ${darkColor} 100%);
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -122,7 +131,7 @@ const RightPanel = styled.div`
 `;
 
 const LoginFormContainer = styled.div`
-  background: rgba(255, 255, 255, 0.95);
+  background: rgba(255, 255, 255, 0.98);
   border-radius: 20px;
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
   padding: 2.5rem;
@@ -160,7 +169,7 @@ const Logo = styled.div`
   width: 80px;
   height: 80px;
   margin: 0 auto 1.5rem;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, ${primaryColor} 0%, ${darkColor} 100%);
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -179,11 +188,11 @@ const Logo = styled.div`
 `;
 
 const Title = styled.h1`
-  color: #2c3e50;
+  color: ${darkColor};
   margin: 0;
   font-size: 1.8rem;
   font-weight: 700;
-  background: linear-gradient(to right, #667eea, #764ba2);
+  background: linear-gradient(to right, ${primaryColor}, ${accentColor});
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   
@@ -193,7 +202,7 @@ const Title = styled.h1`
 `;
 
 const Subtitle = styled.p`
-  color: #7f8c8d;
+  color: ${secondaryColor};
   margin: 0.5rem 0 0;
   font-size: 0.9rem;
   font-weight: 400;
@@ -208,7 +217,7 @@ const FormGroup = styled.div`
 const InputLabel = styled.label`
   display: block;
   margin-bottom: 0.5rem;
-  color: #4a5568;
+  color: ${darkColor};
   font-size: 0.9rem;
   font-weight: 500;
 `;
@@ -222,7 +231,7 @@ const InputContainer = styled.div`
 const InputIcon = styled.div`
   position: absolute;
   left: 12px;
-  color: #a0aec0;
+  color: ${secondaryColor};
   font-size: 1.1rem;
 `;
 
@@ -235,17 +244,18 @@ const InputField = styled.input`
   transition: all 0.3s ease;
   box-sizing: border-box;
   background-color: #f8fafc;
-  color: #2d3748;
+  color: ${darkColor};
   
   &:focus {
-    border-color: #667eea;
-    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
+    border-color: ${accentColor};
+    box-shadow: 0 0 0 3px rgba(24, 179, 172, 0.2);
     outline: none;
     background-color: white;
   }
   
   &::placeholder {
-    color: #a0aec0;
+    color: ${secondaryColor};
+    opacity: 0.7;
   }
 `;
 
@@ -254,13 +264,13 @@ const PasswordToggle = styled.button`
   right: 12px;
   background: none;
   border: none;
-  color: #a0aec0;
+  color: ${secondaryColor};
   cursor: pointer;
   font-size: 1.1rem;
   transition: all 0.2s ease;
   
   &:hover {
-    color: #667eea;
+    color: ${accentColor};
     transform: scale(1.1);
   }
 `;
@@ -268,7 +278,7 @@ const PasswordToggle = styled.button`
 const SubmitButton = styled.button`
   width: 100%;
   padding: 1rem;
-  background: linear-gradient(to right, #667eea, #764ba2);
+  background: linear-gradient(to right, ${primaryColor}, ${accentColor});
   color: white;
   border: none;
   border-radius: 10px;
@@ -281,12 +291,12 @@ const SubmitButton = styled.button`
   align-items: center;
   justify-content: center;
   gap: 8px;
-  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+  box-shadow: 0 4px 15px rgba(19, 107, 92, 0.3);
   
   &:hover {
     transform: translateY(-2px);
-    box-shadow: 0 7px 20px rgba(102, 126, 234, 0.4);
-    background: linear-gradient(to right, #5a6fd1, #6a4299);
+    box-shadow: 0 7px 20px rgba(19, 107, 92, 0.4);
+    background: linear-gradient(to right, #0e5950, #129b8f);
   }
   
   &:active {
@@ -348,8 +358,8 @@ const LoadingOverlay = styled.div`
 const LoadingSpinner = styled.div`
   width: 40px;
   height: 40px;
-  border: 4px solid rgba(102, 126, 234, 0.2);
-  border-top: 4px solid #667eea;
+  border: 4px solid rgba(24, 179, 172, 0.2);
+  border-top: 4px solid ${accentColor};
   border-radius: 50%;
   animation: spin 1s linear infinite;
 
@@ -365,7 +375,7 @@ const ForgotPassword = styled.div`
 `;
 
 const ForgotLink = styled.a`
-  color: #718096;
+  color: ${secondaryColor};
   font-size: 0.8rem;
   text-decoration: none;
   transition: color 0.3s ease;
@@ -374,7 +384,7 @@ const ForgotLink = styled.a`
   gap: 4px;
   
   &:hover {
-    color: #667eea;
+    color: ${accentColor};
     text-decoration: underline;
   }
 `;
@@ -387,6 +397,7 @@ const FeatureTag = styled.div`
   backdrop-filter: blur(5px);
   border: 1px solid rgba(255, 255, 255, 0.1);
   transition: all 0.3s ease;
+  margin: 0.5rem;
   
   &:hover {
     background: rgba(255, 255, 255, 0.25);
@@ -396,7 +407,7 @@ const FeatureTag = styled.div`
 
 const FeatureContainer = styled.div`
   display: flex;
-  gap: 1rem;
+  gap: 0.5rem;
   margin-top: 2rem;
   flex-wrap: wrap;
   justify-content: center;
@@ -567,6 +578,7 @@ const LoginPage = () => {
           <FeatureTag>Secure Authentication</FeatureTag>
           <FeatureTag>Role-Based Access</FeatureTag>
           <FeatureTag>Real-Time Updates</FeatureTag>
+          <FeatureTag>Modern Interface</FeatureTag>
         </FeatureContainer>
       </LeftPanel>
       

@@ -12,10 +12,10 @@ exports.findByEmail = async (email) => {
 
 
 exports.create = async (data) => {
-  const { username, password_hash, full_name, department_id , email } = data;
+  const { username, password_hash, full_name, department_id , email , phone_number } = data;
   const result = await pool.query(
-    'INSERT INTO departmentleader (leader_id, username, password_hash, full_name, department_id, email) VALUES (gen_random_uuid(), $1, $2, $3, $4 ,$5) RETURNING *',
-    [username, password_hash, full_name, department_id , email]
+    'INSERT INTO departmentleader (leader_id, username, password_hash, full_name, department_id, email , phone_number) VALUES (gen_random_uuid(), $1, $2, $3, $4 ,$5) RETURNING *',
+    [username, password_hash, full_name, department_id , email , phone_number]
   );
   return result.rows[0];
 };

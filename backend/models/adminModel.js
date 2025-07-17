@@ -14,10 +14,10 @@ exports.findByEmail = async (email) => {
 
 
 // Create a new admin
-exports.createAdmin = async (username, password_hash, email) => {
+exports.createAdmin = async (username, password_hash, email, phone_number) => {
   const result = await pool.query(
-    'INSERT INTO admin (admin_id, username, password_hash, email) VALUES (gen_random_uuid(), $1, $2, $3) RETURNING *',
-    [username, password_hash, email]
+    'INSERT INTO admin (admin_id, username, password_hash, email,phone_number) VALUES (gen_random_uuid(), $1, $2, $3,$4) RETURNING *',
+    [username, password_hash, email , phone_number]
   );
   return result.rows[0];
 };

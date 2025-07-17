@@ -11,7 +11,7 @@ exports.getAllLeaders = async (req, res) => {
 
 exports.createLeader = async (req, res) => {
   try {
-    const { email, password_hash } = req.body;
+    const { username ,full_name ,email, password_hash,phone_number } = req.body;
 
     // Check for existing email
     const existing = await DepartmentLeaderModel.findByEmail(email);
@@ -20,10 +20,11 @@ exports.createLeader = async (req, res) => {
     }
 
     const hashedPassword = await bcrypt.hash(password_hash, 10);
-    const leader = await DepartmentLeaderModel.create({ ...req.body, password_hash: hashedPassword });
+    const leader = await DepartmentLeaderModel.create({ username,full_name ,email,  password_hash: hashedPassword,  phone_number,department_id});
 
     res.status(201).json(leader);
   } catch (err) {
+    console.error('Error creating leader:', err); 
     res.status(500).json({ error: err.message });
   }
 };

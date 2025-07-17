@@ -15,7 +15,7 @@ exports.getAdmins = async (req, res) => {
 // POST create admin
 exports.createAdmin = async (req, res) => {
   try {
-    const { username, password_hash, email } = req.body;
+    const { username, password_hash, email ,phone_number} = req.body;
 
     // Check for existing email
     const existing = await AdminModel.findByEmail(email);
@@ -24,7 +24,7 @@ exports.createAdmin = async (req, res) => {
     }
 
     const hashedPassword = await bcrypt.hash(password_hash, 10);
-    const newAdmin = await AdminModel.createAdmin(username, hashedPassword, email);
+    const newAdmin = await AdminModel.createAdmin(username, hashedPassword, email,phone_number);
     res.status(201).json(newAdmin);
   } catch (err) {
     res.status(500).json({ error: err.message });
