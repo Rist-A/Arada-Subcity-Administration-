@@ -135,8 +135,9 @@ import { useNavigate } from 'react-router-dom';
 import abstract from '../assets/abstract.png';
 import hero from '../assets/A(3).mp4';
 import { FiEye, FiEyeOff, FiLock, FiMail, FiAlertCircle, FiCheckCircle, FiClock, FiX } from 'react-icons/fi';
+import axios from 'axios';
 
-const WelcomePage = ({ onStart }) => {
+const WelcomePage = () => {
   const [showText, setShowText] = useState(false);
   const [showLogin, setShowLogin] = useState(false);
   const [email, setEmail] = useState('');
@@ -152,13 +153,7 @@ const WelcomePage = ({ onStart }) => {
   const buttonRef = useRef(null);
   const navigate = useNavigate();
 
-  // Color Theme
-  const primaryColor = '#136b5c';
-  const secondaryColor = '#6d9f9a';
-  const accentColor = '#18b3ac';
-  const lightColor = '#f0f9f8';
-  const darkColor = '#0a2524';
-
+  // Handle login modal toggle
   const handleLoginClick = () => {
     setShowLogin(true);
   };
@@ -169,6 +164,38 @@ const WelcomePage = ({ onStart }) => {
     setPassword('');
     setError('');
     setSuccess('');
+  };
+
+  // Check for existing lockout
+  useEffect(() => {
+    const storedLockout = localStorage.getItem('loginLockout');
+    if (storedLockout) {
+      const { timestamp, attempts } = JSON.parse(storedLockout);
+      const now = Date.now();
+      const elapsed = (now - timestamp) / (1000 * 60); // minutes
+
+      if (elapsed < 30) {
+        setIsLocked(true);
+        setLockoutTime(Math.ceil(30 - elapsed));
+        startCountdown();
+      } else {
+        localStorage.removeItem('loginLockout');
+      }
+    }
+  }, []);
+
+  const startCountdown = () => {
+    const interval = setInterval(() => {
+      setLockoutTime(prev => {
+        if (prev <= 1) {
+          clearInterval(interval);
+          setIsLocked(false);
+          localStorage.removeItem('loginLockout');
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 60000);
   };
 
   const handleSubmit = async (e) => {
@@ -186,32 +213,77 @@ const WelcomePage = ({ onStart }) => {
     }
 
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      const response = await axios.post('/api/login', { 
+        email: email.trim(),
+        password: password.trim()
+      });
       
       setSuccess('Login successful! Redirecting...');
       setFailedAttempts(0);
       
-      // Redirect after successful login
+      // Store token and user data
+      localStorage.setItem('authToken', response.data.token);
+      
+      // Decode token to get user role
+      const tokenData = JSON.parse(atob(response.data.token.split('.')[1]));
+      
+      // Redirect based on user role
       setTimeout(() => {
-        navigate('/dashboard');
+        switch(tokenData.role) {
+          case 'mainadmin':
+            navigate('/main-admin');
+            break;
+          case 'subadmin':
+            navigate('/sub-admin');
+            break;
+          case 'department_leader':
+            navigate('/department');
+            break;
+          default:
+            navigate('/dashboard');
+        }
       }, 1500);
       
     } catch (err) {
       setLoading(false);
-      const newAttempts = failedAttempts + 1;
-      setFailedAttempts(newAttempts);
       
-      if (newAttempts >= 5) {
-        setIsLocked(true);
-        setLockoutTime(30);
-        setError('Too many failed attempts. Account locked for 30 minutes.');
+      if (err.response) {
+        switch(err.response.status) {
+          case 401:
+            const newAttempts = failedAttempts + 1;
+            setFailedAttempts(newAttempts);
+            
+            if (newAttempts >= 5) {
+              setIsLocked(true);
+              setLockoutTime(30);
+              localStorage.setItem('loginLockout', JSON.stringify({
+                timestamp: Date.now(),
+                attempts: newAttempts
+              }));
+              startCountdown();
+              setError('Too many failed attempts. Account locked for 30 minutes.');
+            } else {
+              setError(`Invalid credentials. ${5 - newAttempts} attempts remaining.`);
+            }
+            break;
+            
+          case 404:
+            setError('No account found with this email address.');
+            break;
+            
+          case 403:
+            setError('Your account is inactive. Please contact support.');
+            break;
+            
+          default:
+            setError('An unexpected error occurred. Please try again later.');
+        }
+        
+        setShake(true);
+        setTimeout(() => setShake(false), 500);
       } else {
-        setError(`Invalid credentials. ${5 - newAttempts} attempts remaining.`);
+        setError('Network error. Please check your connection and try again.');
       }
-      
-      setShake(true);
-      setTimeout(() => setShake(false), 500);
     }
   };
 
